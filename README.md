@@ -27,10 +27,10 @@ pip install -r requirements.txt
 ```
 
 ### Setup
-#### Hardware
+#### Hardware:
 - Connect the Robotiq gripper to the wrist of the robot.
 
-#### Pendant
+#### Pendant:
 1. Set a static IP address for the robot through the pendant and ensure it matches the static IP address of the computer being used.
 2. Create a simple program on the pendant such as a loop consisting of 0.1 s 'wait'. This program must be running while the Python code is being run.
 3. Install the URCap required for Robotiq grippers.
@@ -39,5 +39,5 @@ pip install -r requirements.txt
 6. In Settings > Security > Services, ensure that RTDE is detected and activated.
 7. Select 'Remote Control' mode before running the Python code.
 
-#### Software
+#### Software:
 - Run teleop_keyboard.py as sudo.
