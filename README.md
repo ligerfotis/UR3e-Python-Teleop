@@ -25,6 +25,7 @@ cd UR3e-Python-Teleop
 ```
 pip install -r requirements.txt
 ```
+4. Copy robotiq_gripper_python.urp to the teach pendant using a USB drive.
 
 ### Setup
 #### Hardware:
@@ -32,11 +33,11 @@ pip install -r requirements.txt
 
 #### Pendant:
 1. Set a static IP address for the robot through the pendant and ensure it matches the static IP address of the computer being used.
-2. Create a simple program on the pendant such as a loop consisting of 0.1 s 'wait'. This program must be running while the Python code is being run.
-3. Install the URCap required for Robotiq grippers.
-4. In Installation > General > Tool I/O, select 'Controlled by' "Robotiq_Grippers".
-5. In Installation > Gripper, ensure the gripper is detected and activated.
-6. In Settings > Security > Services, ensure that RTDE is detected and activated.
+2. Install the URCap required for Robotiq grippers.
+3. In Installation > General > Tool I/O, select 'Controlled by' "Robotiq_Grippers".
+4. In Installation > Gripper, ensure the gripper is detected and activated.
+5. In Settings > Security > Services, ensure that RTDE is detected and activated.
+6. Run the UR program robotiq_gripper_python.urp.
 7. Select 'Remote Control' mode before running the Python code.
 
 #### Software:
