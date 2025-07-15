@@ -5,6 +5,7 @@ This repository contains Python code to control a UR3e-2 cobot with a wrist-atta
 The setup involves:
 - UR3e Robotic Arm
 - 2F-140 Robotiq two-finger gripper
+- PlayStation-5 (DualSense) controller
 
 ## Software Requirements
 - **OS:** Ubuntu
@@ -30,6 +31,7 @@ pip install -r requirements.txt
 ### Setup
 #### Hardware:
 - Connect the Robotiq gripper to the wrist of the robot.
+- Connect the PlayStation-5 controller to the computer using Bluetooth.
 
 #### Pendant:
 1. Set a static IP address for the robot through the pendant and ensure it matches the static IP address of the computer being used.
@@ -41,4 +43,5 @@ pip install -r requirements.txt
 7. Select 'Remote Control' mode before running the Python code.
 
 #### Software:
-- Run teleop_keyboard.py as sudo.
+- Run teleop_keyboard.py as sudo for keyboard control of UR3e.
+- Run teleop_ps5.py for PlayStation-5 controller control of UR3e.
