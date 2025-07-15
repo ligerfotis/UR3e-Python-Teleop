@@ -1,5 +1,5 @@
 # UR3e Python Teleop
-This repository contains Python code to control a UR3e-2 cobot with a wrist-attached Robotiq 2F-140 two-finger gripper.
+This repository contains Python codes to control a UR3e-2 cobot with a wrist-attached Robotiq 2F-140 two-finger gripper using a keyboard and a PlayStation-5 controller.
 
 ## Experimental Setup
 The setup involves:
