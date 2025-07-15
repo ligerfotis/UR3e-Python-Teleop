@@ -1,6 +1,6 @@
 """Python code to control UR 6-DOF TCP movement and gripper opening/closing with a keyboard"""
-"""Run code as sudo"""
-"""Activate gripper prior to start"""
+"""Run code as sudo
+Activate gripper prior to start"""
 
 import keyboard
 from rtde_control import RTDEControlInterface
@@ -51,31 +51,31 @@ try:
 
         # Translation
         elif keyboard.is_pressed("a"): # Left
-            speed_vector = [linear_speed_magnitude, 0.0, 0.0, 0.0, 0.0, 0.0]
+            speed_vector[0] = linear_speed_magnitude
         elif keyboard.is_pressed("d"): # Right
-            speed_vector = [-linear_speed_magnitude, 0.0, 0.0, 0.0, 0.0, 0.0]
+            speed_vector[0] = -linear_speed_magnitude
         elif keyboard.is_pressed("w"): # Up
-            speed_vector = [0.0, 0.0, -linear_speed_magnitude, 0.0, 0.0, 0.0]
+            speed_vector[1] = -linear_speed_magnitude
         elif keyboard.is_pressed("s"): # Down
-            speed_vector = [0.0, 0.0, linear_speed_magnitude, 0.0, 0.0, 0.0]
+            speed_vector[1] = linear_speed_magnitude
         elif keyboard.is_pressed("y"): # Forward (y for German keyboard, change to z if required)
-            speed_vector = [0.0, -linear_speed_magnitude, 0.0, 0.0, 0.0, 0.0]
+            speed_vector[2] = linear_speed_magnitude
         elif keyboard.is_pressed("x"): # Backward
-            speed_vector = [0.0, linear_speed_magnitude, 0.0, 0.0, 0.0, 0.0]
+            speed_vector[2] = -linear_speed_magnitude
 
         # Rotation
         elif keyboard.is_pressed("i"): # Forward
-            speed_vector = [0.0, 0.0, 0.0, angular_speed_magnitude, 0.0, 0.0]
+            speed_vector[3] = angular_speed_magnitude
         elif keyboard.is_pressed("k"): # Backward
-            speed_vector = [0.0, 0.0, 0.0, -angular_speed_magnitude, 0.0, 0.0]
+            speed_vector[3] = -angular_speed_magnitude
         elif keyboard.is_pressed("j"): # Left Upward
-            speed_vector = [0.0, 0.0, 0.0, 0.0, angular_speed_magnitude, 0.0]
+            speed_vector[4] = angular_speed_magnitude
         elif keyboard.is_pressed("l"): # Right Upward
-            speed_vector = [0.0, 0.0, 0.0, 0.0, -angular_speed_magnitude, 0.0]
+            speed_vector[4] = -angular_speed_magnitude
         elif keyboard.is_pressed("n"): # Rotate left
-            speed_vector = [0.0, 0.0, 0.0, 0.0, 0.0, angular_speed_magnitude]
+            speed_vector[5] = angular_speed_magnitude
         elif keyboard.is_pressed("m"): # Rotate right
-            speed_vector = [0.0, 0.0, 0.0, 0.0, 0.0, -angular_speed_magnitude]
+            speed_vector[5] = -angular_speed_magnitude
 
         # Gripper control
         elif keyboard.is_pressed("left"): # Close
