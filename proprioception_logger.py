@@ -17,9 +17,11 @@ def proprioception_logger(root_dir: str, duration: float,  robot_ip: str, sampli
         sampling_rate: Sampling rate of data in Hz (Default: 10.0 Hz)
 
     Returns:
-        TCP Pose with respect to base in Cartesian coordinate system [x, y, z, Rx, Ry, Rz]
-        Joint angles in radians for 6 joints starting from the base
-        Robotiq gripper finger distance
+        A JSON file containing the following proprioception data:
+            Timestamp of data recording
+            TCP Pose with respect to base in Cartesian coordinate system [x, y, z, Rx, Ry, Rz]
+            Joint angles in radians for 6 joints starting from the base
+            Robotiq gripper finger distance
 
     All linear distances are captured in mm.
     All angles are captured in radians.
@@ -42,6 +44,7 @@ def proprioception_logger(root_dir: str, duration: float,  robot_ip: str, sampli
     # Capture proprioception data within duration
     while time.time() - start_time < duration:
         timestamp = time.time()
+        elapsed_time = timestamp - start_time
 
         tcp_pose_m = rtde_receive.getActualTCPPose() # TCP Pose => [x, y, z, Rx, Ry, Rz]
         tcp_pose_mm = [
@@ -58,7 +61,7 @@ def proprioception_logger(root_dir: str, duration: float,  robot_ip: str, sampli
 
         # Store data as a dictionary
         entry = {
-            "timestamp": timestamp,
+            "elapsed_time": elapsed_time,
             "tcp_pose_mm": tcp_pose_mm,
             "joint_positions_rad": joint_pos,
             "gripper_position_0_255": gripper_pos,
