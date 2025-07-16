@@ -1,17 +1,33 @@
+"""Sensor manager for proprioception logging, DIGIT sensor data acquisition for a specified duration"""
+"""Uses function proprioception_logger from proprioception_logger.py"""
 import os
 import time
-from digit_interface import DigitHandler, Digit
 import cv2
+import threading
+from digit_sensor_capture import DigitHandler, Digit
+from proprioception_logger import proprioception_logger
 
-# Configure root_directory
-root_dir = "sensor_data"
+# Set directories
+root_dir = r"/home/sujatha/Desktop/" # Root directory
+sub_dir = os.path.join(root_dir, "16_07_2025") # Change name accordingly
+os.makedirs(sub_dir, exist_ok=True) # If no directory exists then create directory
 
+# Set duration of capture
+duration = 10 # Seconds
+
+# Set static IP of robot
+robot_ip = "192.168.1.223"
+
+"""Starts proprioception data logging using proprioception_logger.py"""
+# Set up thread for recording proprioception data in background
+prop_thread = threading.Thread(target=proprioception_logger, args=(sub_dir, duration, robot_ip))
+prop_thread.start()
+
+"""Starts DIGIT sensor data acquisition"""
+# Capture DIGIT sensor data
 # Subdirectory for DIGIT sensor data
-digit_dir = os.path.join(root_dir, "digit_sensor")
+digit_dir = os.path.join(sub_dir, "digit_sensors")
 os.makedirs(digit_dir, exist_ok=True) # If no directory exists then create directory
-
-# Duration of capture
-duration = 20 # Seconds
 
 # Detect connected DIGIT sensors
 digits = DigitHandler.list_digits()
@@ -22,9 +38,6 @@ for digit in digits:
     serial = digit.get("serial")
     if serial and serial not in digit_serials:
         digit_serials.append(serial)
-
-# Print serial numbers of detected DIGIT sensors
-print("Connected Digit sensor serial numbers:", digit_serials)
 
 # Connect to detected DIGIT sensors
 digits_connected = []
@@ -45,7 +58,7 @@ frame_counts = {serial: 0 for serial in digit_serials}
 
 # Frame capture
 start_time = time.time() # Initialize timer
-print(f"Capturing frames for {duration} seconds.")
+print(f"DIGIT data capture started. Connected Digit sensor serial numbers: {digit_serials}")
 
 # Capture frames within duration
 while time.time() - start_time < duration:
@@ -57,7 +70,7 @@ while time.time() - start_time < duration:
         cv2.imshow(window_name, frame)
 
         # Save frames in respective subdirectories
-        frame_name = f"{serial}_{frame_counts[serial]:04d}.png" # Saves frame count in 4 digits
+        frame_name = f"{serial}_{frame_counts[serial]:05d}.png" # Saves frame count in 5 digits
         frame_path = os.path.join(sensor_dirs[serial], frame_name)
         cv2.imwrite(frame_path, frame)
         frame_counts[serial] += 1
@@ -75,5 +88,9 @@ cv2.destroyAllWindows()
 
 # Print frame count
 for serial, d in digits_connected:
-    print(f"Total frames ({serial}): {frame_counts[serial]:04d}")
-print("Frame capture complete.")
+    print(f"Total DIGIT frames ({serial}): {frame_counts[serial]:05d}")
+print(f"DIGIT data capture complete. Saved to {digit_dir}.")
+
+# Wait for proprioception thread to finish
+prop_thread.join()
+print("\nAll sensors completed.")
