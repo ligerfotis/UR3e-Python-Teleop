@@ -1,4 +1,4 @@
-"""Function to log proprioception data from UR cobot"""
+"""Function to log proprioception data in JSON format from UR cobot"""
 """Tested using UR3e"""
 
 import json
@@ -79,4 +79,4 @@ def proprioception_logger(root_dir: str, duration: float,  robot_ip: str, sampli
     with open(file_name, "w") as f:
         json.dump(log, f, indent=4)
 
-    print(f"Proprioception logging complete. Saved to {file_name}.")
+    print(f"Proprioception logging complete. Saved to {file_name}")

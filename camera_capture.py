@@ -26,14 +26,14 @@ def camera_capture(root_dir, duration, camera_index, output_queue):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
     if fps == 0 or fps is None:
-        fps = 30  # Default FPS
+        fps = 30  # Default frame rate
 
-    # Define filepath
+    # Set filename
     video_path = os.path.join(root_dir, "camera_output.avi") # AVI format
 
-    # Define video writer
+    # Define VideoWriter
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(video_path, fourcc, fps, (width, height))
+    cam_writer = cv2.VideoWriter(video_path, fourcc, fps, (width, height))
 
     # Start camera capture
     frame_count = 0
@@ -48,10 +48,10 @@ def camera_capture(root_dir, duration, camera_index, output_queue):
 
         # Output frames
         output_queue.put(frame) # Put frame in queue for live preview
-        out.write(frame) # Write frame to video
+        cam_writer.write(frame) # Write frame to video
         frame_count += 1
 
     # Close camera
-    cap.release() # Close live preview
-    out.release() # Close frame writing
-    print(f"Camera capture complete. {frame_count} frames saved to {root_dir}.")
+    cap.release() # Release video stream
+    cam_writer.release() # Release VideoWriter
+    print(f"Camera capture complete. {frame_count} frames saved to {root_dir}")
