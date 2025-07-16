@@ -1,6 +1,5 @@
 """Function to log proprioception data from UR cobot"""
 """Tested using UR3e"""
-"""Obtains TCP Pose with respect to base in Cartesian coordinate system, joint angles and Robotiq 2F-140 gripper pose"""
 
 import json
 import os
@@ -11,7 +10,18 @@ from robotiq_socket_gripper import RobotiqSocketGripper
 
 def proprioception_logger(root_dir: str, duration: float,  robot_ip: str, sampling_rate=10.0):
     """
-    All distances are captured in mm.
+    Args:
+        root_dir: Main directory to save data
+        duration: Duration in seconds to log proprioception data
+        robot_ip: IP address of robot
+        sampling_rate: Sampling rate of data in Hz (Default: 10.0 Hz)
+
+    Returns:
+        TCP Pose with respect to base in Cartesian coordinate system [x, y, z, Rx, Ry, Rz]
+        Joint angles in radians for 6 joints starting from the base
+        Robotiq gripper finger distance
+
+    All linear distances are captured in mm.
     All angles are captured in radians.
     """
 
