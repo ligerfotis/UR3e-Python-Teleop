@@ -1,12 +1,14 @@
-"""Sensor manager for proprioception logging, DIGIT sensor data acquisition for a specified duration"""
+"""Sensor manager for proprioception logging, DIGIT sensor and RGB camera data acquisition for a specified duration"""
 """Uses function proprioception_logger from proprioception_logger.py"""
 
 import os
 import time
 import cv2
 import threading
+import queue
 from digit_sensor_capture import DigitHandler, Digit
 from proprioception_logger import proprioception_logger
+from camera_capture import camera_capture
 
 # Set directories
 root_dir = r"/home/sujatha/Desktop/" # Root directory
@@ -19,10 +21,28 @@ duration = 10 # Seconds
 # Set static IP of robot
 robot_ip = "192.168.1.223"
 
+# Detect working camera index
+camera_index = None
+
+for i in range(5): # Checking for camera in indices 0-4
+    cap = cv2.VideoCapture(i)
+    if cap.isOpened():
+        cap.release()
+        camera_index = i
+        break
+
+if camera_index is None:
+    print("No camera detected.")
+
+# Set up threading and queue for camera
+camera_queue = queue.Queue()
+camera_thread = threading.Thread(target=camera_capture, args=(sub_dir, duration, camera_index, camera_queue))
+
 """Starts proprioception data logging using proprioception_logger.py"""
 # Set up thread for recording proprioception data in background
 prop_thread = threading.Thread(target=proprioception_logger, args=(sub_dir, duration, robot_ip))
 prop_thread.start()
+camera_thread.start()
 
 """Starts DIGIT sensor data acquisition"""
 # Capture DIGIT sensor data
@@ -70,6 +90,11 @@ while time.time() - start_time < duration:
         window_name = f"DIGIT Sensor {serial}"
         cv2.imshow(window_name, frame)
 
+        # Display camera feed
+        if not camera_queue.empty():
+            cam_frame = camera_queue.get()
+            cv2.imshow("Camera Feed", cam_frame)
+
         # Save frames in respective subdirectories
         frame_name = f"{serial}_{frame_counts[serial]:05d}.png" # Saves frame count in 5 digits
         frame_path = os.path.join(sensor_dirs[serial], frame_name)
@@ -94,4 +119,5 @@ print(f"DIGIT data capture complete. Saved to {digit_dir}.")
 
 # Wait for proprioception thread to finish
 prop_thread.join()
+camera_thread.join()
 print("\nAll sensors completed.")

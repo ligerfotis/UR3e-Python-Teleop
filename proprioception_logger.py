@@ -8,7 +8,7 @@ from rtde_receive import RTDEReceiveInterface
 from robotiq_socket_gripper import RobotiqSocketGripper
 
 
-def proprioception_logger(root_dir: str, duration: float,  robot_ip: str, sampling_rate=10.0):
+def proprioception_logger(root_dir: str, duration: float,  robot_ip: str, sampling_rate: float = 10):
     """
     Args:
         root_dir: Main directory to save data
@@ -24,10 +24,6 @@ def proprioception_logger(root_dir: str, duration: float,  robot_ip: str, sampli
     All linear distances are captured in mm.
     All angles are captured in radians.
     """
-
-    # Subdirectory for proprioception data
-    prop_dir = os.path.join(root_dir, "proprioception")
-    os.makedirs(prop_dir, exist_ok=True)
 
     # Connect to robot and gripper
     rtde_receive = RTDEReceiveInterface(robot_ip)
@@ -74,7 +70,7 @@ def proprioception_logger(root_dir: str, duration: float,  robot_ip: str, sampli
         time.sleep(sampling_interval)
 
     # Output file name
-    file_name = os.path.join(prop_dir, "proprioception_log.json")
+    file_name = os.path.join(root_dir, "proprioception_log.json")
 
     # Save proprioception data
     with open(file_name, "w") as f:
