@@ -1,5 +1,5 @@
 """Python code to control UR 6-DOF TCP movement and gripper opening/closing with a PlayStation controller"""
-""""Tested using a PS5 DualSense Controller"""
+""""Tested using a PS5 DualSense Controller and a UR3e cobot"""
 """Activate gripper prior to start"""
 
 import pygame
@@ -59,7 +59,7 @@ def rescale_axis(axis_position, axis_ini_position):
         axis_ini_position: Axis position of joystick at rest (value between -1 and 1)
 
     Returns:
-
+        rescaled_position: Rescaled axis position of joystick (value between -1 and 1)
     """
     low_segment_len = 1 + axis_ini_position # Distance from initial position to minimum possible position (-1)
     upper_segment_len = 1 - axis_ini_position # Distance from initial position to maximum possible position (-1)

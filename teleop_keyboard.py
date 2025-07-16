@@ -1,6 +1,7 @@
 """Python code to control UR 6-DOF TCP movement and gripper opening/closing with a keyboard"""
-"""Run code as sudo
-Activate gripper prior to start"""
+"""Tested using a UR3e cobot"""
+"""Run code as sudo"""
+"""Activate gripper prior to start"""
 
 import keyboard
 from rtde_control import RTDEControlInterface
