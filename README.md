@@ -8,7 +8,7 @@ The setup involves:
 - PlayStation-5 (DualSense) controller
 
 ## Software Requirements
-- **OS:** Ubuntu
+- **OS:** Ubuntu 22.04.5 LTS
 - **Python:** 3.10 (PyCharm virtual environment)
 - **Libraries:** keyboard, ur-rtde, pyserial, numpy, setuptools
 - **PolyScope:** 5.15
@@ -45,3 +45,6 @@ pip install -r requirements.txt
 #### Software:
 - Run teleop_keyboard.py as sudo for keyboard control of UR3e.
 - Run teleop_ps5.py for PlayStation-5 controller control of UR3e.
+
+### Known Issues
+The codes teleop_keyboard.py and teleop_ps5.py do not check for singularities. If a singularity is reached, the robot will enter a protective stop.

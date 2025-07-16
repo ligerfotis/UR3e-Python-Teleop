@@ -7,7 +7,7 @@ from rtde_control import RTDEControlInterface
 from robotiq_socket_gripper import RobotiqSocketGripper
 
 # Connect to robot and gripper
-robot_ip = "192.168.1.223"  # Ensure static IP addresses of robot and computer match
+robot_ip = "192.168.1.223" # Ensure static IP addresses of robot and computer match
 rtde_control = RTDEControlInterface(robot_ip)
 
 gripper = RobotiqSocketGripper(robot_ip)
@@ -23,9 +23,9 @@ Speed vector ->
 """
 
 # Speed parameters
-linear_speed_magnitude = 0.05  # m/s
-angular_speed_magnitude = 0.25  # rad/s
-speed_vector = [0.0] * 6  # Initialization
+linear_speed_magnitude = 0.05 # m/s
+angular_speed_magnitude = 0.25 # rad/s
+speed_vector = [0.0] * 6 # Initialization
 
 # Gripper parameters
 i = 1 # Increment for gripper movement
