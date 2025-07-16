@@ -1,5 +1,6 @@
 """Sensor manager for proprioception logging, DIGIT sensor data acquisition for a specified duration"""
 """Uses function proprioception_logger from proprioception_logger.py"""
+
 import os
 import time
 import cv2
