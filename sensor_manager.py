@@ -6,7 +6,7 @@ import time
 import cv2
 import threading
 import queue
-from digit_sensor_capture import DigitHandler, Digit
+from digit_interface import DigitHandler, Digit
 from proprioception_logger import proprioception_logger
 from camera_capture import camera_capture
 
