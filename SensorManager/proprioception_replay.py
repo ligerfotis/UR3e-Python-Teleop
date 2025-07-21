@@ -21,7 +21,7 @@ Units:
 import json
 import time
 from rtde_control import RTDEControlInterface
-from robotiq_socket_gripper import RobotiqSocketGripper
+from Teleop.robotiq_socket_gripper import RobotiqSocketGripper
 
 # Set parameters
 robot_ip = "192.168.1.223"

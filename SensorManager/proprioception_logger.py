@@ -5,7 +5,7 @@
 import json
 import time
 from rtde_receive import RTDEReceiveInterface
-from robotiq_socket_gripper import RobotiqSocketGripper
+from Teleop.robotiq_socket_gripper import RobotiqSocketGripper
 
 from get_unique_filename import get_unique_filename
 

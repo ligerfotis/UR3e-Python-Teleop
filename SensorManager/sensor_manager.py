@@ -16,7 +16,7 @@ from digit_capture import digit_capture
 
 # Set parameters
 robot_ip = "192.168.1.223" # Ensure static IP of robot matches that of computer
-root_dir = r"/TRIAL_CAMERAS"  # Root directory to save all recorded data
+root_dir = r"/TRIAL"  # Root directory to save all recorded data
 os.makedirs(root_dir, exist_ok=True)
 
 # Set recording control events
