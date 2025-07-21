@@ -1,7 +1,0 @@
-keyboard==0.13.5
-numpy==2.2.6
-pyserial==3.5
-ur_rtde==1.6.1
-pygame~=2.6.1
-opencv-python~=4.12.0.88
-digit_interface~=0.2.1
