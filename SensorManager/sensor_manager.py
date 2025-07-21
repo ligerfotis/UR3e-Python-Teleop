@@ -13,20 +13,21 @@ from digit_interface import DigitHandler, Digit
 from proprioception_logger import proprioception_logger
 from sensor_control_keyboard import sensor_control_keyboard
 from digit_capture import digit_capture
+from audio_capture import audio_capture
 
 # Set parameters
 robot_ip = "192.168.1.223" # Ensure static IP of robot matches that of computer
-root_dir = r"/TRIAL"  # Root directory to save all recorded data
+root_dir = r"/home/sujatha/TRIAL"  # Root directory to save all recorded data
 os.makedirs(root_dir, exist_ok=True)
 
 # Set recording control events
-start_event = threading.Event()
+recording_event = threading.Event()
 stop_event = threading.Event()
 
 # Thread for keyboard control of recording
 keyboard_thread = threading.Thread(
     target=sensor_control_keyboard,
-    args=(start_event, stop_event),
+    args=(recording_event, stop_event),
     daemon=True
 )
 keyboard_thread.start() # Start keyboard thread
@@ -38,7 +39,7 @@ for idx in range(15): # Queues for upto 5 cameras
 
 camera_thread = threading.Thread(
     target=camera_capture,
-    args=(root_dir, start_event, stop_event, camera_frame_queues),
+    args=(root_dir, recording_event, stop_event, camera_frame_queues),
 )
 camera_thread.start() # Start camera thread
 
@@ -51,14 +52,21 @@ for d_info in digit_devices:
 
 digit_thread = threading.Thread(
     target=digit_capture,
-    args=(root_dir, start_event, stop_event, digit_frame_queues),
+    args=(root_dir, recording_event, stop_event, digit_frame_queues),
 )
 digit_thread.start() # Start DIGIT thread
+
+# Thread for audio capture
+audio_thread = threading.Thread(
+    target=audio_capture,
+    args=(root_dir, recording_event, stop_event),
+)
+audio_thread.start()
 
 # Thread for proprioception logging
 prop_thread = threading.Thread(
     target=proprioception_logger,
-    args=(root_dir, start_event, stop_event, robot_ip),
+    args=(root_dir, recording_event, stop_event, robot_ip),
 )
 prop_thread.start() # Start proprioception logging thread
 
@@ -86,6 +94,7 @@ while not stop_event.is_set():
 # Wait for all threads to stop
 camera_thread.join()
 digit_thread.join()
+audio_thread.join()
 prop_thread.join()
 
 # Close live preview

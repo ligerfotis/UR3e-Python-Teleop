@@ -5,7 +5,7 @@
 
 import keyboard
 from rtde_control import RTDEControlInterface
-from Teleop.robotiq_socket_gripper import RobotiqSocketGripper
+from robotiq_socket_gripper import RobotiqSocketGripper
 
 # Connect to robot and gripper
 robot_ip = "192.168.1.223" # Ensure static IP addresses of robot and computer match

@@ -7,17 +7,21 @@ import keyboard
 import time
 
 
-def sensor_control_keyboard(start_event: threading.Event, stop_event: threading.Event):
+def sensor_control_keyboard(recording_event: threading.Event, stop_event: threading.Event):
     """
-    Pressing 'r' starts recording and pressing 's' stops the program and recording
+    Pressing '1' starts recording, pressing '2' stops recording and pressing '3' stops the program.
     """
-    print("Press 'r' to start recording and 's' to stop the program.")
+    print("Once all sensors are active, press '1' to start recording, '2' to stop recording, '3' to stop the program.")
     while not stop_event.is_set():
-        if keyboard.is_pressed('r') and not start_event.is_set():
-            start_event.set()
+        if keyboard.is_pressed('1') and not recording_event.is_set():
+            recording_event.set()
             print("Recording started.")
             time.sleep(0.5) # Debounce
-        elif keyboard.is_pressed('s'):
-            stop_event.set()
+        elif keyboard.is_pressed('2') and recording_event.is_set():
+            recording_event.clear()
             print("Recording stopped.")
+            time.sleep(0.5) # Debounce
+        elif keyboard.is_pressed('3'):
+            stop_event.set()
+            print("Program stopped.")
             time.sleep(0.5) # Debounce

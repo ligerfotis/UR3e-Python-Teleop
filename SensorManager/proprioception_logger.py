@@ -1,6 +1,7 @@
 """Function to log proprioception data in JSON format from a UR cobot"""
 """Uses function from get_unique_filename.py"""
 """Tested using a UR3e cobot"""
+"""Intended to be used with sensor_manager.py for coordinated logging of proprioception with other sensors"""
 
 import json
 import time
@@ -43,6 +44,7 @@ def proprioception_logger(root_dir: str, start_event, stop_event,  robot_ip: str
     start_time = None # Initialize timer
 
     # Capture data
+    print("Proprioception logger ready.")
     while not stop_event.is_set():
         # Start recording when start_event is triggered
         if start_event.is_set():
@@ -76,12 +78,13 @@ def proprioception_logger(root_dir: str, start_event, stop_event,  robot_ip: str
 
         time.sleep(0.1) # 10 Hz frequency of recording
 
-    # Save proprioception data to JSON file
+    # Save proprioception data to JSON file if captured
     if log:
         # Create unique filename to prevent overwriting
         file_path = get_unique_filename("proprioception_log", ".json", root_dir)
-
         # Save file
         with open(file_path, "w") as f:
             json.dump(log, f, indent=4)
         print(f"Proprioception data saved to {file_path}")
+    else:
+        print("Proprioception stopped. No data saved.")
