@@ -33,13 +33,13 @@ gripper.set_force(100) # Range: 0 (min) to 255 (max)
 gripper.set_speed(50) # Range: 0 (min) to 255 (max)
 current_pos = gripper.get_pos() or 0 # Initialize gripper position
 
-print("""6-DOF Robot Control. Press 'Option' button to quit.
+print("""6-DOF Robot Control Using PS5 Controller. Press 'Option' button (three horizontal lines, right of controller) to quit.
 LEFT JOYSTICK: Translate right/left, forward/backward
-RIGHT JOYSTICK: Rotate left/right, up/down
+RIGHT JOYSTICK: Rotate left upward/right upward, forward/backward
 L1, L2: Up/down
 R1, R2: Rotate left/right about Z-axis
-Square: Close gripper
-Circle: Open gripper""")
+SQUARE: Close gripper
+CIRCLE: Open gripper""")
 
 # Initiate jogging with 0 speed
 rtde_control.jogStart(speed_vector, RTDEControlInterface.FEATURE_TOOL)
