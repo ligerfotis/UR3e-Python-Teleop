@@ -7,13 +7,14 @@ import os
 import threading
 import queue
 import cv2
-
-from camera_capture import camera_capture
 from digit_interface import DigitHandler, Digit
-from proprioception_logger import proprioception_logger
+
 from sensor_control_keyboard import sensor_control_keyboard
+from camera_capture import camera_capture
 from digit_capture import digit_capture
+from realsense_capture import realsense_capture
 from audio_capture import audio_capture
+from proprioception_logger import proprioception_logger
 
 # Set parameters
 robot_ip = "192.168.1.223" # Ensure static IP of robot matches that of computer
@@ -56,6 +57,19 @@ digit_thread = threading.Thread(
 )
 digit_thread.start() # Start DIGIT thread
 
+# Queues and thread for RealSense capture
+realsense_queues = {
+    "color": queue.Queue(maxsize=1),
+    "depth": queue.Queue(maxsize=1),
+} # Dict => RealSense Camera Type: queue.Queue
+
+realsense_thread = threading.Thread(
+    target=realsense_capture,
+    args=(root_dir, recording_event, stop_event, realsense_queues),
+    daemon=True
+)
+realsense_thread.start() # Start RealSense thread
+
 # Thread for audio capture
 audio_thread = threading.Thread(
     target=audio_capture,
@@ -81,19 +95,27 @@ while not stop_event.is_set():
 
     # Show DIGIT frames
     for serial, digit_queue in digit_frame_queues.items():
-        if not digit_queue.empty(): # Gets frame if one is available in queue
-            serial, frame = digit_queue.get()
+        if not digit_queue.empty():
+            frame = digit_queue.get()
             if frame is not None:
-                cv2.imshow(f"Digit {serial}", frame)
+                cv2.imshow(f"DIGIT {serial}", frame)
+
+    # Show RealSense frames
+    for type, realsense_queue in realsense_queues.items():
+        if not realsense_queue.empty():
+            frame = realsense_queue.get()
+            if frame is not None:
+                cv2.imshow(f"RealSense {type}", frame)
 
     # Exit if 's' is pressed
-    if cv2.waitKey(1) & 0xFF == ord("s"):
+    if cv2.waitKey(1) & 0xFF == ord("3"):
         stop_event.set()
         break
 
 # Wait for all threads to stop
 camera_thread.join()
 digit_thread.join()
+realsense_thread.join()
 audio_thread.join()
 prop_thread.join()
 

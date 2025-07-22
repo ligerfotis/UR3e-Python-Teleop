@@ -1,7 +1,7 @@
-"""Function to log proprioception data in JSON format from a UR cobot"""
+"""Function to log proprioception data in JSON format from a UR cobot based on keyboard input"""
 """Uses function from get_unique_filename.py"""
 """Tested using a UR3e cobot"""
-"""Intended to be used with sensor_manager.py for coordinated logging of proprioception with other sensors"""
+"""Intended to be used with sensor_manager.py and associated functions"""
 
 import json
 import time
@@ -11,11 +11,13 @@ from Teleop.robotiq_socket_gripper import RobotiqSocketGripper
 from get_unique_filename import get_unique_filename
 
 
-def proprioception_logger(root_dir: str, start_event, stop_event,  robot_ip: str):
+def proprioception_logger(root_dir: str, recording_event, stop_event, robot_ip: str):
     """
+    Records multiple logs in one program session based on keyboard inputs
+    
     Args:
         root_dir: Root directory to save data
-        start_event: threading.Event to start logging from
+        recording_event: threading.Event to start logging from
         stop_event: threading.Event to stop logging from
         robot_ip: Static IP address of robot
 
@@ -39,52 +41,61 @@ def proprioception_logger(root_dir: str, start_event, stop_event,  robot_ip: str
     def gripper_pos_to_mm(pos_0_255):
         return 140.0 * (1 - (pos_0_255 / 255.0))
 
-    # Proprioception log
-    log = []  # Initialize logger
-    start_time = None # Initialize timer
+    # Initialize variables
+    log = []
+    recording = False # To check whether recording is in progress
+    start_time = None
 
-    # Capture data
-    print("Proprioception logger ready.")
-    while not stop_event.is_set():
-        # Start recording when start_event is triggered
-        if start_event.is_set():
-            if start_time is None: # Print initialization status
-                start_time = time.time()
-                print("Proprioception logger started.")
+    # Main loop
+    try:
+        print("- Proprioception thread ready.")
+        while not stop_event.is_set(): # Before program stop
+            # Start when recording_event is triggered
+            if recording_event.is_set():
+                if not recording: # Initialization
+                    print("+ Proprioception logger started.")
+                    log = []  # Reset log
+                    start_time = time.time()
+                    recording = True
 
-            # Log during duration
-            timestamp = time.time()
-            elapsed = timestamp - start_time
+                # Calculate time elapsed
+                timestamp = time.time()
+                elapsed = timestamp - start_time
 
-            # TCP pose
-            tcp_pose_m = rtde_receive.getActualTCPPose()
-            tcp_pose_mm = [x * 1000 if i < 3 else x for i, x in enumerate(tcp_pose_m)] # Convert to mm
+                # TCP pose
+                tcp_pose_m = rtde_receive.getActualTCPPose()
+                tcp_pose_mm = [x * 1000 if i < 3 else x for i, x in enumerate(tcp_pose_m)]
+                # Joint positions
+                joint_pos = rtde_receive.getActualQ()
+                # Gripper pose
+                gripper_pos = gripper.get_pos() or 0
+                gripper_mm = gripper_pos_to_mm(gripper_pos)
 
-            # Joint positions
-            joint_pos = rtde_receive.getActualQ()
+                # Append to log
+                log.append({
+                    "elapsed_time": elapsed,
+                    "tcp_pose_mm": tcp_pose_mm,
+                    "joint_positions_rad": joint_pos,
+                    "gripper_position_0_255": gripper_pos,
+                    "gripper_position_mm": gripper_mm
+                })
 
-            # Gripper pose
-            gripper_pos = gripper.get_pos() or 0 # Absolute (0-255)
-            gripper_mm = gripper_pos_to_mm(gripper_pos) # In mm
+            # When recording is just stopped
+            elif recording and not recording_event.is_set():
+                # Save log to JSON file
+                if log:
+                    # Create unique filename to prevent overwriting
+                    filepath = get_unique_filename("proprioception_log", ".json", root_dir)
+                    # Save file
+                    with open(filepath, "w") as f:
+                        json.dump(log, f, indent=4)
+                    print(f"! Proprioception logger stopped, data saved to {filepath}")
+                else:
+                    print("No proprioception data recorded.")
+                recording = False
+                log = [] # Reset log
 
-            # Save log
-            log.append({
-                "elapsed_time": elapsed,
-                "tcp_pose_mm": tcp_pose_mm,
-                "joint_positions_rad": joint_pos,
-                "gripper_position_0_255": gripper_pos,
-                "gripper_position_mm": gripper_mm
-            })
+            time.sleep(0.1)  # Log at 10 Hz
 
-        time.sleep(0.1) # 10 Hz frequency of recording
-
-    # Save proprioception data to JSON file if captured
-    if log:
-        # Create unique filename to prevent overwriting
-        file_path = get_unique_filename("proprioception_log", ".json", root_dir)
-        # Save file
-        with open(file_path, "w") as f:
-            json.dump(log, f, indent=4)
-        print(f"Proprioception data saved to {file_path}")
-    else:
-        print("Proprioception stopped. No data saved.")
+    finally:
+        print("Proprioception logger stopped.")
