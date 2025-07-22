@@ -7,7 +7,7 @@ import os
 import threading
 import queue
 import cv2
-from digit_interface import DigitHandler, Digit
+from digit_interface import DigitHandler
 
 from sensor_control_keyboard import sensor_control_keyboard
 from camera_capture import camera_capture
@@ -18,7 +18,7 @@ from proprioception_logger import proprioception_logger
 
 # Set parameters
 robot_ip = "192.168.1.223" # Ensure static IP of robot matches that of computer
-root_dir = r"/home/sujatha/TRIAL"  # Root directory to save all recorded data
+root_dir = r"/home/sujatha/Demo_Battery_Insertion_4"  # Root directory to save all recorded data
 os.makedirs(root_dir, exist_ok=True)
 
 # Set recording control events
