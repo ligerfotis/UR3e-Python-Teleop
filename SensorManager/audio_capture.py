@@ -71,7 +71,7 @@ def audio_capture(root_dir: str, recording_event, stop_event):
                     # Concatenate all buffer data
                     audio_data = np.concatenate(buffer)
                     # Create unique filename to prevent overwriting
-                    filepath = get_unique_filename("webcam_audio", ".wav", root_dir)
+                    filepath = get_unique_filename("microphone_audio", ".wav", root_dir)
                     # Write audio to filepath
                     sf.write(filepath, audio_data, samplerate)
                     print(f"! Audio recording stopped, saved to {filepath}")

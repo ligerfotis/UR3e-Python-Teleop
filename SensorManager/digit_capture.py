@@ -6,7 +6,7 @@ import cv2
 from digit_interface import Digit
 from digit_interface.digit_handler import DigitHandler
 
-from SensorManager.get_unique_filename import get_unique_filename
+from get_unique_filename import get_unique_filename
 
 
 def digit_capture(root_dir: str, recording_event, stop_event, frame_queues: dict):
