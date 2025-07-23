@@ -6,6 +6,8 @@
 
 import cv2
 import pyudev
+import time
+import json
 
 from get_unique_filename import get_unique_filename
 
@@ -81,6 +83,9 @@ def camera_capture(root_dir: str, recording_event, stop_event, frame_queues: dic
     cam_writers = {}
     fourcc = cv2.VideoWriter_fourcc(*'XVID') # VideoWriter for AVI
     fps = 30 # Writer FPS
+    start_times = {}
+    frame_logs = {}
+    frame_counts = {}
 
     # Main loop
     try:
@@ -105,16 +110,34 @@ def camera_capture(root_dir: str, recording_event, stop_event, frame_queues: dic
                         filepath = get_unique_filename(f"camera_{idx}", ".avi", root_dir)
                         # Define VideoWriter
                         cam_writers[idx] = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
+                        # Initialize for frame logging
+                        start_times[idx] = time.time()
+                        frame_logs[idx] = []
+                        frame_counts[idx] = 0
                         print(f"+ Camera {idx} recording started. Saving to {filepath}")
 
                     # Write frames within recording duration
                     cam_writers[idx].write(frame)
+                    # Log frame time
+                    elapsed_time = time.time() - start_times[idx]
+                    frame_logs[idx].append({
+                        "elapsed_time": elapsed_time,
+                        "frame_count": frame_counts[idx],
+                    })
+                    frame_counts[idx] += 1
 
                 # Stop recording when recording_event is cleared
                 elif idx in cam_writers:
                     cam_writers[idx].release()
                     del cam_writers[idx]
                     print(f"! Camera {idx} recording stopped.")
+
+                    # Save log
+                    log_path = get_unique_filename(f"camera_{idx}_log", ".json", root_dir)
+                    with open(log_path, "w") as f:
+                        json.dump(frame_logs[idx], f, indent=4)
+                    print(f"! Camera {idx} frame log saved to {log_path}")
+                    frame_logs[idx] = [] # Reset log
 
     # Release video streams and VideoWriters
     finally:

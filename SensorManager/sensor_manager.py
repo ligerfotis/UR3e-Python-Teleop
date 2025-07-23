@@ -18,7 +18,7 @@ from proprioception_logger import proprioception_logger
 
 # Set parameters
 robot_ip = "192.168.1.223" # Ensure static IP of robot matches that of computer
-root_dir = r"/home/sujatha/Demo_Battery_Insertion_4"  # Root directory to save all recorded data
+root_dir = r"/home/sujatha/Demo_Only_DIGIT"  # Root directory to save all recorded data
 os.makedirs(root_dir, exist_ok=True)
 
 # Set recording control events
@@ -36,7 +36,7 @@ keyboard_thread.start() # Start keyboard thread
 # Queues and thread for camera capture
 camera_frame_queues = {}  # Dict => Camera index: queue.Queue
 for idx in range(15): # Queues for upto 5 cameras
-    camera_frame_queues[idx] = queue.Queue(maxsize=10) # Queue holds 10 frames at a time
+    camera_frame_queues[idx] = queue.Queue(maxsize=1) # Queue holds 10 frames at a time
 
 camera_thread = threading.Thread(
     target=camera_capture,
@@ -49,7 +49,7 @@ digit_devices = DigitHandler.list_digits()
 digit_frame_queues = {}  # Dict => DIGIT Serial: queue.Queue
 for d_info in digit_devices:
     serial = d_info["serial"]
-    digit_frame_queues[serial] = queue.Queue(maxsize=10) # Queues for all detected DIGIT sensors
+    digit_frame_queues[serial] = queue.Queue(maxsize=1) # Queues for all detected DIGIT sensors
 
 digit_thread = threading.Thread(
     target=digit_capture,

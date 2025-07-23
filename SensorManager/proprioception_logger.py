@@ -49,7 +49,14 @@ def proprioception_logger(root_dir: str, recording_event, stop_event, robot_ip: 
     # Main loop
     try:
         print("- Proprioception thread ready.")
+
+        # Initialize variables for 30 Hz counter
+        target_hz = 30
+        time_interval = 1.0 / target_hz
+        next_time = time.perf_counter()
+
         while not stop_event.is_set(): # Before program stop
+            now = time.perf_counter()
             # Start when recording_event is triggered
             if recording_event.is_set():
                 if not recording: # Initialization
@@ -95,7 +102,11 @@ def proprioception_logger(root_dir: str, recording_event, stop_event, robot_ip: 
                 recording = False
                 log = [] # Reset log
 
-            time.sleep(0.1)  # Log at 10 Hz
+            # Precise 30 Hz sleep
+            next_time += time_interval
+            sleep_duration = next_time - time.perf_counter()
+            if sleep_duration > 0: # Sleep only if there is time remaining before next target
+                time.sleep(sleep_duration)
 
     finally:
         print("Proprioception logger stopped.")

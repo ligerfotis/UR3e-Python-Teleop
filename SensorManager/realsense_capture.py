@@ -7,6 +7,7 @@ import pyrealsense2 as rs
 import cv2
 import numpy as np
 import time
+import json
 
 from get_unique_filename import get_unique_filename
 
@@ -27,7 +28,7 @@ def realsense_capture(root_dir: str, recording_event, stop_event, frame_queues: 
     config = rs.config()
 
     # Enable streams
-    # Default width and height (640, 480), 8-bit channels, 30 FPS
+    # Default width and height (640, 480), 8-bit/16-bit channels, 30 FPS
     config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30) # RGB
     config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30) # Depth
 
@@ -38,9 +39,13 @@ def realsense_capture(root_dir: str, recording_event, stop_event, frame_queues: 
         print(f"Failed to start RealSense pipeline: {e}")
         return
 
+    # Initialize variables
     color_writer, depth_writer = None, None
     fourcc = cv2.VideoWriter_fourcc(*'XVID') # VideoWriter for AVI
     fps = 30 # Writer FPS
+    start_time = None
+    frame_log = []
+    frame_count = 0
 
     # Main loop
     try:
@@ -78,11 +83,22 @@ def realsense_capture(root_dir: str, recording_event, stop_event, frame_queues: 
                     # Define VideoWriters
                     color_writer = cv2.VideoWriter(color_path, fourcc, fps, (width, height))
                     depth_writer = cv2.VideoWriter(depth_path, fourcc, fps, (width, height))
+                    # Initialize for frame logging
+                    start_time = time.time()
+                    frame_log = []
+                    frame_count = 0
                     print(f"+ RealSense recording started: \n  Color video saving to {color_path}\n  Depth video saving to {depth_path}")
 
                 # Write frames within recording duration
                 color_writer.write(color_image)
                 depth_writer.write(depth_colormap)
+                # Log frame time
+                elapsed_time = time.time() - start_time
+                frame_log.append({
+                    "elapsed_time": elapsed_time,
+                    "frame_count": frame_count,
+                })
+                frame_count += 1
 
             # Stop recording when recording_event is cleared
             elif color_writer or depth_writer:
@@ -95,7 +111,12 @@ def realsense_capture(root_dir: str, recording_event, stop_event, frame_queues: 
                     depth_writer = None
                     print("! RealSense depth recording stopped.")
 
-            time.sleep(0.03) # Idle time to wait for next recording
+                if frame_log:
+                    log_path = get_unique_filename("realsense_log", ".json", root_dir)
+                    with open(log_path, "w") as f:
+                        json.dump(frame_log, f, indent=4)
+                    print(f"! RealSense frame log saved to {log_path}")
+                    frame_log = [] # Reset log
 
     # Release video streams and VideoWriters
     finally:

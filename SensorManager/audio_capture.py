@@ -4,6 +4,8 @@
 import sounddevice as sd
 import soundfile as sf
 import numpy as np
+import time
+import json
 
 from get_unique_filename import get_unique_filename
 
@@ -40,6 +42,9 @@ def audio_capture(root_dir: str, recording_event, stop_event):
             # Start recording when triggered
             if recording_event.is_set():
                 buffer = [] # Reset buffer to store audio chunks
+                audio_log = [] # Reset log
+                start_time = time.time() # Start timer
+                frame_count = 0
                 print("+ Audio recording started.")
 
                 # Callback function to handle incoming audio data
@@ -51,10 +56,17 @@ def audio_capture(root_dir: str, recording_event, stop_event):
                         time_info: Metadata about timing of audio
                         status: Reports errors and warnings
                     """
+                    nonlocal frame_count
 
                     if stop_event.is_set(): # Checks if program is stopped
                         raise sd.CallbackAbort
                     buffer.append(indata.copy()) # Append incoming audio to buffer
+                    elapsed_time = time.time() - start_time
+                    audio_log.append({
+                        "elapsed_time": elapsed_time,
+                        "frame_count": frame_count,
+                    })
+                    frame_count += 1
 
                 try:
                     # Open input audio stream
@@ -75,6 +87,13 @@ def audio_capture(root_dir: str, recording_event, stop_event):
                     # Write audio to filepath
                     sf.write(filepath, audio_data, samplerate)
                     print(f"! Audio recording stopped, saved to {filepath}")
+
+                    # Save log
+                    log_path = get_unique_filename("microphone_log", ".json", root_dir)
+                    with open(log_path, "w") as f:
+                        json.dump(audio_log, f, indent=4)
+                    print(f"! Audio log saved to {log_path}")
+
                 else:
                     print("No audio data captured.")
 

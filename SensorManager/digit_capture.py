@@ -3,6 +3,8 @@
 """Intended to be used with sensor_manager.py and associated functions"""
 
 import cv2
+import time
+import json
 from digit_interface import Digit
 from digit_interface.digit_handler import DigitHandler
 
@@ -49,6 +51,9 @@ def digit_capture(root_dir: str, recording_event, stop_event, frame_queues: dict
     digit_writers = {}
     fourcc = cv2.VideoWriter_fourcc(*"XVID") # VideoWriter for AVI
     fps = 30 # Writer FPS
+    start_times = {}
+    frame_logs = {}
+    frame_counts = {}
 
     # Main loop
     try:
@@ -74,16 +79,34 @@ def digit_capture(root_dir: str, recording_event, stop_event, frame_queues: dict
                         filepath = get_unique_filename(f"{serial}_output", ".avi", root_dir)
                         # Define VideoWriter
                         digit_writers[serial] = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
+                        # Initialize for frame logging
+                        start_times[serial] = time.time()
+                        frame_logs[serial] = []
+                        frame_counts[serial] = 0
                         print(f"+ DIGIT {serial} recording started. Saving to {filepath}")
 
                     # Write frames within recording duration
                     digit_writers[serial].write(frame)
+                    # Log frame time
+                    elapsed_time = time.time() - start_times[serial]
+                    frame_logs[serial].append({
+                        "elapsed_time": elapsed_time,
+                        "frame_count": frame_counts[serial],
+                    })
+                    frame_counts[serial] += 1
 
                 # Stop recording when recording_event is cleared
                 elif serial in digit_writers:
                     digit_writers[serial].release()
                     del digit_writers[serial]
                     print(f"! DIGIT {serial} recording stopped.")
+
+                    # Save log
+                    log_path = get_unique_filename(f"{serial}_log", ".json", root_dir)
+                    with open(log_path, "w") as f:
+                        json.dump(frame_logs[serial], f, indent=4)
+                    print(f"! DIGIT {serial} frame log saved to {log_path}")
+                    frame_logs[serial] = [] # Reset log
 
     # Release connected DIGIT sensors and VideoWriters
     finally:
