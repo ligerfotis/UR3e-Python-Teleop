@@ -8,3 +8,4 @@ digit_interface~=0.2.1
 pyudev~=0.24.3
 sounddevice~=0.5.2
 soundfile~=0.13.1
+pyrealsense2~=2.55.1.6486
