@@ -1,29 +1,27 @@
-"""Function to record camera data from multiple cameras as AVI videos based on keyboard inputs"""
+"""To record camera data from one camera as AVI videos based on keyboard inputs"""
 """Ignores feed from RealSense cameras and DIGIT sensors"""
-"""find_camera_indices() works on Linux systems only"""
+"""find_camera_index() works on Linux systems only"""
 """Uses function from get_unique_filename.py"""
 """Intended to be used with sensor_manager.py and associated functions"""
 
 import cv2
 import pyudev
-import time
 import json
+from time import perf_counter as now
 
 from get_unique_filename import get_unique_filename
 
 
-# Function to automatically detect indices where cameras are connected ignoring DIGIT sensors and RealSense cameras
-def find_camera_indices():
+# Function to automatically detect an index where a camera is connected ignoring DIGIT sensors and RealSense cameras
+def find_camera_index():
     """
-    Returns list of real camera indices, ignoring DIGIT sensors and RealSense cameras using udev metadata
+    Returns first working camera index, ignoring DIGIT sensors and RealSense cameras using udev metadata
     pyudev works only on Linux systems
     """
-    context = pyudev.Context() # List devices
-    camera_indices = []
 
-    # Identify connected video output devices
+    context = pyudev.Context() # List devices
     for device in context.list_devices(subsystem='video4linux'):
-        dev_node = device.device_node # Gets filepath of video output devices
+        dev_node = device.device_node
         if not dev_node.startswith("/dev/video"):
             continue
 
@@ -39,110 +37,124 @@ def find_camera_indices():
                 continue
 
         # Confirm camera is working
-        print(f"Checking /dev/video{index} for non-RealSense camera...")
-        cap = cv2.VideoCapture(index) # Open video stream
+        cap = cv2.VideoCapture(index)
         if cap.isOpened():
-            ret, frame = cap.read() # Read frame
-            if ret and frame is not None:
-                camera_indices.append(index)
+            ret, frame = cap.read() # Open video stream
             cap.release() # Close video stream
-
-    return sorted(camera_indices)
+            if ret and frame is not None:
+                return index
+        if not cap.isOpened():
+            print(f"Failed to open camera {index}.")
+    return None
 
 
 # Main function to capture and preview camera data
-def camera_capture(root_dir: str, recording_event, stop_event, frame_queues: dict):
+def camera_capture(root_dir: str, recording_event, stop_event, frame_queue):
     """
-    Records multiple videos in one program session based on keyboard inputs
+        Records multiple videos from a camera in one program session based on keyboard inputs
 
-    Args:
-        root_dir: Root directory to save videos
-        recording_event: threading.Event to start recording
-        stop_event: threading.Event to stop the program
-        frame_queues: queue.Queue per camera index to store frames for live preview
-    """
+        Args:
+            root_dir: Root directory to save videos
+            recording_event: threading.Event to start recording
+            stop_event: threading.Event to stop the program
+            frame_queue: queue.Queue to store frames for live preview
+        """
 
-    # Detect working cameras ignoring DIGIT sensors
-    camera_indices = find_camera_indices()
-    if not camera_indices:
-        print("No camera indices detected.")
+    # Detect working camera automatically
+    cam_index = find_camera_index()
+    if cam_index is None:
+        print("No camera detected.")
         return
-    else:
-        print(f"Detected camera indices: {camera_indices}")
+    print(f"Detected camera index: {cam_index}")
 
-    caps = []
     # Initialize cameras
-    for idx in camera_indices:
-        cap = cv2.VideoCapture(idx) # Open video streams
-        if cap.isOpened():
-            caps.append((idx, cap))
-        else:
-            print(f"Failed to open camera index {idx}")
+    cap = cv2.VideoCapture(cam_index) # Open video stream
+    if not cap.isOpened():
+        print(f"Failed to open camera index {cam_index}")
+        return
 
     # Initialize variables
-    cam_writers = {}
-    fourcc = cv2.VideoWriter_fourcc(*'XVID') # VideoWriter for AVI
-    fps = 30 # Writer FPS
-    start_times = {}
-    frame_logs = {}
-    frame_counts = {}
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    start_time = None
+    frame_log = [] # To store frame timestamps
+    frame_count = 0
+    frame_buffer = [] # To store frames in memory till recording stops
+    recording_initialized = False # Flag
 
     # Main loop
     try:
-        print("- Camera thread ready.")
+        print(f"- Camera {cam_index} thread ready.")
         while not stop_event.is_set(): # Before program stop
-            for idx, cap in caps:
-                ret, frame = cap.read() # Read frames
-                if not ret: # Continue even if frame is missed
-                    continue
+            ret, frame = cap.read() # Get frame
+            if not ret:
+                continue # Continue even if frame is skipped
 
-                # Live preview of camera feeds even when not recording
-                if idx in frame_queues and not frame_queues[idx].full():
-                    frame_queues[idx].put(frame)
+            # Live preview of camera feeds even when not recording
+            if frame_queue and not frame_queue.full():
+                frame_queue.put(frame)
 
-                # Start recording when triggered
-                if recording_event.is_set():
-                    if idx not in cam_writers: # Initialization
-                        # Get camera properties
-                        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                        # Get unique filepath to prevent overwriting
-                        filepath = get_unique_filename(f"camera_{idx}", ".avi", root_dir)
-                        # Define VideoWriter
-                        cam_writers[idx] = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
-                        # Initialize for frame logging
-                        start_times[idx] = time.time()
-                        frame_logs[idx] = []
-                        frame_counts[idx] = 0
-                        print(f"+ Camera {idx} recording started. Saving to {filepath}")
+            # Start recording when triggered
+            if recording_event.is_set():
+                # Initialization
+                if not recording_initialized:
+                    start_time = now() # Start timer
+                    # Reset variables
+                    frame_log = []
+                    frame_count = 0
+                    frame_buffer = []
+                    recording_initialized = True # Set flag
+                    print(f"+ Camera {cam_index} recording started.")
 
-                    # Write frames within recording duration
-                    cam_writers[idx].write(frame)
-                    # Log frame time
-                    elapsed_time = time.time() - start_times[idx]
-                    frame_logs[idx].append({
-                        "elapsed_time": elapsed_time,
-                        "frame_count": frame_counts[idx],
-                    })
-                    frame_counts[idx] += 1
+                # Save frames within recording duration
+                frame_buffer.append(frame)
+                # Log frame time
+                time_elapsed = now() - start_time
+                frame_log.append({
+                    "elapsed_time": time_elapsed,
+                    "frame_count": frame_count
+                })
+                frame_count += 1
 
-                # Stop recording when recording_event is cleared
-                elif idx in cam_writers:
-                    cam_writers[idx].release()
-                    del cam_writers[idx]
-                    print(f"! Camera {idx} recording stopped.")
+            # Stop recording when recording_event is cleared
+            elif recording_initialized:
+                # Calculate actual FPS
+                duration = now() - start_time
+                actual_fps = frame_count / duration if duration > 0 else 30
 
-                    # Save log
-                    log_path = get_unique_filename(f"camera_{idx}_log", ".json", root_dir)
-                    with open(log_path, "w") as f:
-                        json.dump(frame_logs[idx], f, indent=4)
-                    print(f"! Camera {idx} frame log saved to {log_path}")
-                    frame_logs[idx] = [] # Reset log
+                print(f"! Camera {cam_index} recording stopped.")
 
-    # Release video streams and VideoWriters
+                # Save frame log
+                # Get unique filepath to prevent overwriting
+                log_path = get_unique_filename(f"camera_{cam_index}_log", ".json", root_dir)
+                with open(log_path, "w") as f:
+                    json.dump(frame_log, f, indent=4)
+
+                # Catch FPS deviations greater than 3
+                if abs(actual_fps - 30) > 3:
+                    print(f"[WARNING] Camera {cam_index} FPS deviated significantly: {actual_fps:.2f}")
+
+                # Write frames using actual FPS
+                # Get unique filepath to prevent overwriting
+                final_path = get_unique_filename(f"camera_{cam_index}_final", ".avi", root_dir)
+                # Get frame properties
+                height, width = frame_buffer[0].shape[:2]
+
+                # Write frames
+                frame_writer = cv2.VideoWriter(final_path, fourcc, actual_fps, (width, height))
+                for frame in frame_buffer:
+                    frame_writer.write(frame)
+                frame_writer.release()
+
+                print(f"Camera {cam_index} video saved with {actual_fps:.2f} FPS to {final_path}")
+
+                # Reset variables
+                start_time = None
+                frame_log = []
+                frame_count = 0
+                frame_buffer = []
+                recording_initialized = False
+
     finally:
-        for idx, cap in caps:
-            cap.release()
-        for writer in cam_writers.values():
-            writer.release()
+        # Close video streams
+        cap.release()
         print("Camera capture stopped.")

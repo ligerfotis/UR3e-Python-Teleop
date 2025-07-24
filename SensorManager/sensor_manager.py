@@ -19,7 +19,7 @@ from proprioception_logger import proprioception_logger
 
 # Set parameters
 robot_ip = "192.168.1.223" # Ensure static IP of robot matches that of computer
-root_dir = r"/home/sujatha/Trial_All" # Root directory to save all recorded data
+root_dir = r"/home/sujatha/Test3" # Root directory to save all recorded data
 os.makedirs(root_dir, exist_ok=True)
 
 # Set recording control events
@@ -37,13 +37,11 @@ keyboard_thread = threading.Thread(
 keyboard_thread.start() # Start keyboard thread
 
 # Queues and thread for camera capture
-camera_frame_queues = {}  # Dict => Camera index: queue.Queue
-for idx in range(15): # Queues for upto 5 cameras
-    camera_frame_queues[idx] = queue.Queue(maxsize=1) # Queue holds 10 frames at a time
+camera_frame_queue = queue.Queue(maxsize=1)
 
 camera_thread = threading.Thread(
     target=camera_capture,
-    args=(root_dir, recording_event, stop_event, camera_frame_queues),
+    args=(root_dir, recording_event, stop_event, camera_frame_queue),
 )
 camera_thread.start() # Start camera thread
 
@@ -94,10 +92,9 @@ prop_thread.start() # Start proprioception logging thread
 # Live preview loop
 while not stop_event.is_set():
     # Show camera frames
-    for cam_id, cam_queue in camera_frame_queues.items():
-        if not cam_queue.empty(): # Gets frame if one is available in queue
-            frame = cam_queue.get()
-            cv2.imshow(f"Camera {cam_id}", frame)
+    if not camera_frame_queue.empty():
+        frame = camera_frame_queue.get()
+        cv2.imshow("Camera", frame)
 
     # Show DIGIT frames
     for serial, digit_queue in digit_frame_queues.items():
@@ -125,6 +122,7 @@ realsense_color_thread.join()
 realsense_depth_thread.join()
 audio_thread.join()
 prop_thread.join()
+keyboard_thread.join()
 
 # Close live preview
 cv2.destroyAllWindows()
