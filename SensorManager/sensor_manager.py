@@ -12,18 +12,21 @@ from digit_interface import DigitHandler
 from sensor_control_keyboard import sensor_control_keyboard
 from camera_capture import camera_capture
 from digit_capture import digit_capture
-from realsense_capture import realsense_capture
+from realsense_capture_color import realsense_capture_color
+from realsense_capture_depth import realsense_capture_depth
 from audio_capture import audio_capture
 from proprioception_logger import proprioception_logger
 
 # Set parameters
 robot_ip = "192.168.1.223" # Ensure static IP of robot matches that of computer
-root_dir = r"/home/sujatha/Demo_Only_DIGIT"  # Root directory to save all recorded data
+root_dir = r"/home/sujatha/Trial_All" # Root directory to save all recorded data
 os.makedirs(root_dir, exist_ok=True)
 
 # Set recording control events
 recording_event = threading.Event()
 stop_event = threading.Event()
+
+print("Waiting for sensors to start...")
 
 # Thread for keyboard control of recording
 keyboard_thread = threading.Thread(
@@ -59,16 +62,20 @@ digit_thread.start() # Start DIGIT thread
 
 # Queues and thread for RealSense capture
 realsense_queues = {
-    "color": queue.Queue(maxsize=1),
-    "depth": queue.Queue(maxsize=1),
-} # Dict => RealSense Camera Type: queue.Queue
+    "color": queue.Queue(maxsize=5),
+    "depth": queue.Queue(maxsize=5)
+}
 
-realsense_thread = threading.Thread(
-    target=realsense_capture,
-    args=(root_dir, recording_event, stop_event, realsense_queues),
-    daemon=True
+realsense_color_thread = threading.Thread(
+    target=realsense_capture_color,
+    args=(root_dir, recording_event, stop_event, realsense_queues["color"])
 )
-realsense_thread.start() # Start RealSense thread
+realsense_depth_thread = threading.Thread(
+    target=realsense_capture_depth,
+    args=(root_dir, recording_event, stop_event, realsense_queues["depth"])
+)
+realsense_color_thread.start() # Start RealSense threads
+realsense_depth_thread.start()
 
 # Thread for audio capture
 audio_thread = threading.Thread(
@@ -85,7 +92,6 @@ prop_thread = threading.Thread(
 prop_thread.start() # Start proprioception logging thread
 
 # Live preview loop
-print("Waiting for sensors to start...")
 while not stop_event.is_set():
     # Show camera frames
     for cam_id, cam_queue in camera_frame_queues.items():
@@ -101,21 +107,22 @@ while not stop_event.is_set():
                 cv2.imshow(f"DIGIT {serial}", frame)
 
     # Show RealSense frames
-    for type, realsense_queue in realsense_queues.items():
-        if not realsense_queue.empty():
-            frame = realsense_queue.get()
+    for stream, q in realsense_queues.items():
+        if not q.empty():
+            frame = q.get()
             if frame is not None:
-                cv2.imshow(f"RealSense {type}", frame)
+                cv2.imshow(f"RealSense {stream}", frame)
 
     # Exit if 's' is pressed
-    if cv2.waitKey(1) & 0xFF == ord("3"):
+    if cv2.waitKey(10) & 0xFF == ord("3"):
         stop_event.set()
         break
 
 # Wait for all threads to stop
 camera_thread.join()
 digit_thread.join()
-realsense_thread.join()
+realsense_color_thread.join()
+realsense_depth_thread.join()
 audio_thread.join()
 prop_thread.join()
 
