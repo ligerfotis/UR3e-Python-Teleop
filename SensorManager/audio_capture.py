@@ -1,11 +1,12 @@
-"""Function to record audio from a webcam based on keyboard inputs"""
+"""Function to record audio from a microphone based on keyboard inputs"""
+"""Uses function from get_unique_filename.py"""
 """Intended to be used with sensor_manager.py for coordinated recording"""
 
 import sounddevice as sd
 import soundfile as sf
 import numpy as np
-import time
 import json
+from time import perf_counter as now
 
 from get_unique_filename import get_unique_filename
 
@@ -13,7 +14,7 @@ from get_unique_filename import get_unique_filename
 def find_microphone_index():
     for device in sd.query_devices():
         name = device['name'].lower()
-        if "pnp audio" in name: # Change name according to requirement
+        if " " in name: # Add name according to requirement
             return device['index']
     return None
 
@@ -33,40 +34,40 @@ def audio_capture(root_dir: str, recording_event, stop_event):
     samplerate = 48000 # 48 kHz
     channels = 1 # Mono audio
 
-    print(f"Audio device index: {device_index} ")
+    # print(f"Audio device index: {device_index} ")
 
     # Main loop
     try:
-        print("- Audio thread ready.")
+        print(f"- Microphone {device_index} thread ready.")
         while not stop_event.is_set(): # Before program stop
             # Start recording when triggered
             if recording_event.is_set():
+                start_time = now()  # Start timer
                 buffer = [] # Reset buffer to store audio chunks
                 audio_log = [] # Reset log
-                start_time = time.time() # Start timer
-                frame_count = 0
-                print("+ Audio recording started.")
+                sample_count = 0
+                print(f"+ Microphone {device_index} recording started.")
 
                 # Callback function to handle incoming audio data
-                def callback(indata, frames, time_info, status):
+                def callback(indata, samples, time_info, status):
                     """
                     Args:
                         indata: Numpy array of audio data
-                        frames: Number of audio frames per channel
+                        samples: Number of audio samples per channel
                         time_info: Metadata about timing of audio
                         status: Reports errors and warnings
                     """
-                    nonlocal frame_count
+                    nonlocal sample_count
 
                     if stop_event.is_set(): # Checks if program is stopped
                         raise sd.CallbackAbort
                     buffer.append(indata.copy()) # Append incoming audio to buffer
-                    elapsed_time = time.time() - start_time
+                    sample_count += samples
+                    elapsed_time = now() - start_time
                     audio_log.append({
                         "elapsed_time": elapsed_time,
-                        "frame_count": frame_count,
+                        "frame_count": sample_count,
                     })
-                    frame_count += 1
 
                 try:
                     # Open input audio stream
@@ -75,7 +76,7 @@ def audio_capture(root_dir: str, recording_event, stop_event):
                         while recording_event.is_set() and not stop_event.is_set():
                             sd.sleep(100)
                 except Exception as e:
-                    print(f"Audio stream failed: {e}")
+                    print(f"Microphone stream failed: {e}")
                     continue
 
                 # Save audio data to WAV file
@@ -86,16 +87,25 @@ def audio_capture(root_dir: str, recording_event, stop_event):
                     filepath = get_unique_filename("microphone_audio", ".wav", root_dir)
                     # Write audio to filepath
                     sf.write(filepath, audio_data, samplerate)
-                    print(f"! Audio recording stopped, saved to {filepath}")
+                    print(f"! Microphone recording stopped.")
 
                     # Save log
                     log_path = get_unique_filename("microphone_log", ".json", root_dir)
                     with open(log_path, "w") as f:
                         json.dump(audio_log, f, indent=4)
-                    print(f"! Audio log saved to {log_path}")
+
+                    # Calculate actual sample rate
+                    duration = now() - start_time
+                    actual_samplerate = sample_count / duration if duration > 0 else samplerate
+
+                    # Catch FPS deviations greater than 3
+                    if abs(actual_samplerate - samplerate) > 1500:
+                        print(f"[WARNING] Microphone sample rate deviated significantly: {actual_samplerate:.2f}")
+
+                    print(f"Microphone audio saved with {actual_samplerate:.2f} FPS to {filepath}")
 
                 else:
-                    print("No audio data captured.")
+                    print("No microphone data captured.")
 
                 # Reset recording_event to allow next recording
                 recording_event.clear()
@@ -103,4 +113,4 @@ def audio_capture(root_dir: str, recording_event, stop_event):
             sd.sleep(100) # Idle time to wait for next recording
 
     finally:
-        print("Audio capture stopped.")
+        print("Microphone capture stopped.")

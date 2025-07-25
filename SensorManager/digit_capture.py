@@ -64,6 +64,7 @@ def run_digit_thread(serial, root_dir, recording_event, stop_event, frame_queue)
     try:
         digit = Digit(serial)
         digit.connect()
+        # print(f"Connected to DIGIT {serial}")
     except Exception as e:
         print(f"Failed to connect to DIGIT {serial}: {e}")
         return
@@ -114,10 +115,6 @@ def run_digit_thread(serial, root_dir, recording_event, stop_event, frame_queue)
 
             # Stop recording when recording_event is cleared
             elif recording_initialized:
-                # Calculate actual FPS
-                duration = now() - start_time
-                actual_fps = frame_count / duration if duration > 0 else 30
-
                 print(f"! DIGIT {serial} recording stopped.")
 
                 # Save log
@@ -126,23 +123,27 @@ def run_digit_thread(serial, root_dir, recording_event, stop_event, frame_queue)
                 with open(log_path, "w") as f:
                     json.dump(frame_log, f, indent=4)
 
+                # Calculate actual FPS
+                duration = now() - start_time
+                actual_fps = frame_count / duration if duration > 0 else 30
+
                 # Catch FPS deviations greater than 3
                 if abs(actual_fps - 30) > 3:
                     print(f"[WARNING] DIGIT {serial} FPS deviated significantly: {actual_fps:.2f}")
 
                 # Write frames using actual FPS
                 # Get unique filepath to prevent overwriting
-                final_path = get_unique_filename(f"digit_{serial}", ".avi", root_dir)
+                filepath = get_unique_filename(f"digit_{serial}", ".avi", root_dir)
                 # Get frame properties
                 height, width = frame_buffer[0].shape[:2]
 
                 # Write frames
-                frame_writer = cv2.VideoWriter(final_path, fourcc, actual_fps, (width, height))
-                for f in frame_buffer:
-                    frame_writer.write(f)
+                frame_writer = cv2.VideoWriter(filepath, fourcc, actual_fps, (width, height))
+                for frame in frame_buffer:
+                    frame_writer.write(frame)
                 frame_writer.release()
 
-                print(f"DIGIT {serial} video saved with {actual_fps:.2f} FPS to {final_path}")
+                print(f"DIGIT {serial} video saved with {actual_fps:.2f} FPS to {filepath}")
 
                 # Reset variables
                 start_time = None

@@ -65,7 +65,7 @@ def camera_capture(root_dir: str, recording_event, stop_event, frame_queue):
     if cam_index is None:
         print("No camera detected.")
         return
-    print(f"Detected camera index: {cam_index}")
+    # print(f"Detected camera index: {cam_index}")
 
     # Initialize cameras
     cap = cv2.VideoCapture(cam_index) # Open video stream
@@ -117,10 +117,6 @@ def camera_capture(root_dir: str, recording_event, stop_event, frame_queue):
 
             # Stop recording when recording_event is cleared
             elif recording_initialized:
-                # Calculate actual FPS
-                duration = now() - start_time
-                actual_fps = frame_count / duration if duration > 0 else 30
-
                 print(f"! Camera {cam_index} recording stopped.")
 
                 # Save frame log
@@ -129,23 +125,27 @@ def camera_capture(root_dir: str, recording_event, stop_event, frame_queue):
                 with open(log_path, "w") as f:
                     json.dump(frame_log, f, indent=4)
 
+                # Calculate actual FPS
+                duration = now() - start_time
+                actual_fps = frame_count / duration if duration > 0 else 30
+
                 # Catch FPS deviations greater than 3
                 if abs(actual_fps - 30) > 3:
                     print(f"[WARNING] Camera {cam_index} FPS deviated significantly: {actual_fps:.2f}")
 
                 # Write frames using actual FPS
                 # Get unique filepath to prevent overwriting
-                final_path = get_unique_filename(f"camera_{cam_index}_final", ".avi", root_dir)
+                filepath = get_unique_filename(f"camera_{cam_index}_final", ".avi", root_dir)
                 # Get frame properties
                 height, width = frame_buffer[0].shape[:2]
 
                 # Write frames
-                frame_writer = cv2.VideoWriter(final_path, fourcc, actual_fps, (width, height))
+                frame_writer = cv2.VideoWriter(filepath, fourcc, actual_fps, (width, height))
                 for frame in frame_buffer:
                     frame_writer.write(frame)
                 frame_writer.release()
 
-                print(f"Camera {cam_index} video saved with {actual_fps:.2f} FPS to {final_path}")
+                print(f"Camera {cam_index} video saved with {actual_fps:.2f} FPS to {filepath}")
 
                 # Reset variables
                 start_time = None

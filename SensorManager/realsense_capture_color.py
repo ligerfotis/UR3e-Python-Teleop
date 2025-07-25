@@ -1,13 +1,13 @@
 """Function to capture RealSense RGB data as AVI videos based on keyboard inputs"""
-"""Tested with RealSense D435"""
 """Uses function from get_unique_filename.py"""
+"""Tested using a RealSense D435 camera"""
 """Intended to be used with sensor_manager.py and associated functions"""
 
 import pyrealsense2 as rs
 import cv2
 import numpy as np
-import time
 import json
+from time import perf_counter as now
 
 from get_unique_filename import get_unique_filename
 
@@ -65,6 +65,7 @@ def realsense_capture_color(root_dir: str, recording_event, stop_event, frame_qu
             # Start recording when triggered
             if recording_event.is_set():
                 if frame_writer is None: # Initialization
+                    start_time = now()  # Start timer
                     # Get camera properties
                     height, width = color_image.shape[:2]
                     # Get unique filepath to prevent overwriting
@@ -72,15 +73,14 @@ def realsense_capture_color(root_dir: str, recording_event, stop_event, frame_qu
                     # Define VideoWriter
                     frame_writer = cv2.VideoWriter(filepath, fourcc, fps, (width, height))
                     # Initialize for frame logging
-                    start_time = time.time()
                     frame_log = []
                     frame_count = 0
-                    print(f"+ RealSense color recording started, saving to {filepath}")
+                    print(f"+ RealSense color recording started.")
 
                 # Write frames within recording duration
                 frame_writer.write(color_image)
                 # Log frame time
-                elapsed_time = time.time() - start_time
+                elapsed_time = now() - start_time
                 frame_log.append({
                     "elapsed_time": elapsed_time,
                     "frame_count": frame_count
@@ -89,8 +89,6 @@ def realsense_capture_color(root_dir: str, recording_event, stop_event, frame_qu
 
             # Stop recording when recording_event is cleared
             elif frame_writer:
-                frame_writer.release()
-                frame_writer = None
                 print("! RealSense color recording stopped.")
 
                 # Save log
@@ -99,6 +97,20 @@ def realsense_capture_color(root_dir: str, recording_event, stop_event, frame_qu
                     with open(log_path, "w") as f:
                         json.dump(frame_log, f, indent=4)
                     frame_log = [] # Reset log
+
+                # Calculate actual FPS
+                duration = now() - start_time
+                actual_fps = frame_count / duration if duration > 0 else 30
+
+                # Catch FPS deviations greater than 3
+                if abs(actual_fps - 30) > 3:
+                    print(f"[WARNING] RealSense color FPS deviated significantly: {actual_fps:.2f}")
+
+                print(f"Realsense color video saved with {actual_fps:.2f} FPS to {filepath}")
+
+                # Reset writer
+                frame_writer.release()
+                frame_writer = None
 
     # Release video streams and VideoWriters
     finally:

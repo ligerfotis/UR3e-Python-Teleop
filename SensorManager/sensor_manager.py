@@ -1,5 +1,5 @@
 """Sensor manager for capturing data from multiple sensors and logging proprioception of a UR cobot"""
-"""Includes functions from sensor_control_keyboard.py, proprioception_logger.py , camera_capture.py, digit_capture.py, get_unique_filename.py"""
+"""Includes functions from sensor_control_keyboard.py, camera_capture.py, digit_capture.py, realsense_capture_color.py, realsense_capture_depth.py, audio_capture.py and proprioception_logger.py"""
 """Tested using a UR3e cobot"""
 """Run as sudo due to keyboard control of recording"""
 
@@ -18,8 +18,8 @@ from audio_capture import audio_capture
 from proprioception_logger import proprioception_logger
 
 # Set parameters
-robot_ip = "192.168.1.223" # Ensure static IP of robot matches that of computer
-root_dir = r"/home/sujatha/Test3" # Root directory to save all recorded data
+robot_ip = " " # Ensure static IP of robot matches that of computer
+root_dir = r" " # Root directory to save all recorded data
 os.makedirs(root_dir, exist_ok=True)
 
 # Set recording control events
@@ -58,7 +58,7 @@ digit_thread = threading.Thread(
 )
 digit_thread.start() # Start DIGIT thread
 
-# Queues and thread for RealSense capture
+# Queues and thread for RealSense color and depth capture
 realsense_queues = {
     "color": queue.Queue(maxsize=5),
     "depth": queue.Queue(maxsize=5)
