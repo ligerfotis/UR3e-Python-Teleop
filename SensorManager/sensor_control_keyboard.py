@@ -1,5 +1,5 @@
 """Function to control sensor_manager.py using keyboard inputs"""
-"""Enables synchronous activation and deactivation of all sensors used"""
+"""Enables synchronous recording of all sensors used"""
 """Requires sudo permission"""
 
 import threading
