@@ -29,8 +29,21 @@ This code allows for:
 
     ***Right arrow:*** Gripper open
 
+**Other parameters that can be modified include:**
+- Linear speed of robot (for translation)
+- Angular speed of robot (for rotation)
+- Gripper force
+- Gripper speed
+
+***The program is quit by pressing the 'q' key.***
+
+### Working
+- Robot control works using RTDE (Real-Time Data Exchange) protocol.
+- Gripper control is implemented using the class RobotiqSocketGripper (also in the Teleop directory).
+
 ### Requirements
-This code must be run as sudo due to the use of the 'keyboard' library.
+- Fill the static IP address of your robot in the code. 
+- This code must be run as sudo due to the use of the 'keyboard' library.
 
 ## Class RobotiqSocketGripper
 In both methods of teleoperation, Robotiq gripper control is achieved using the class RobotiqSocketGripper. 
