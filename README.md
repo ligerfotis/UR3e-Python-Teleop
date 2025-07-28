@@ -76,4 +76,4 @@ After the initial setup, there are some steps to be followed for setup after eve
 4. Put the robot in 'Remote Control' using the button on the top-right of the screen.
 
 ## Known Issues
-The codes teleop_keyboard.py and teleop_ps5.py do not check for singularities, and so, if a singularity is reached, the robot will enter a protective stop. The robot may require being restarted in order for the Python program to work again.
+The teleoperation codes do not check for singularities, and so, if a singularity is reached, the robot will enter a protective stop. The robot may require being restarted in order for the Python program to work again.
