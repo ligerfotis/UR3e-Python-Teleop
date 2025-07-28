@@ -135,7 +135,7 @@ def camera_capture(root_dir: str, recording_event, stop_event, frame_queue):
 
                 # Write frames using actual FPS
                 # Get unique filepath to prevent overwriting
-                filepath = get_unique_filename(f"camera_{cam_index}_final", ".avi", root_dir)
+                filepath = get_unique_filename(f"camera_{cam_index}", ".avi", root_dir)
                 # Get frame properties
                 height, width = frame_buffer[0].shape[:2]
 
