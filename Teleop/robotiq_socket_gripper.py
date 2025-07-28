@@ -1,4 +1,4 @@
-"""Class using socket to control Robotiq 2F-85 gripper"""
+"""Class using socket to control Robotiq 2F-140 gripper"""
 
 import socket, time
 
