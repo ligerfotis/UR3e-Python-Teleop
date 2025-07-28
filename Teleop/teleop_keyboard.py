@@ -30,7 +30,7 @@ speed_vector = [0.0] * 6 # Initialization
 
 # Gripper parameters
 i = 1 # Increment for gripper movement
-gripper.set_force(100) # Range: 0 (min) to 255 (max)
+gripper.set_force(20) # Range: 0 (min) to 255 (max)
 gripper.set_speed(50) # Range: 0 (min) to 255 (max)
 current_pos = gripper.get_pos() or 0 # Initialize gripper position
 
