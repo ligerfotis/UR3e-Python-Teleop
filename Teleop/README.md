@@ -11,23 +11,23 @@ This code allows for:
 
 1. **3-DOF translation using the keys:**
 
-    *WSAD:* Forward / backward, Left / right
+    ***WSAD:*** Forward / backward, Left / right
 
-    *ZX:* Up / down
+    ***ZX:*** Up / down
 
 
 2.  **3-DOF rotation using the keys:**
 
-    *IKJL:* Rotate forward / backward, Left upward / right upward
+    ***IKJL:*** Rotate forward / backward, Left upward / right upward
 
-    *NM:* Rotate left / right about vertical axis
+    ***NM:*** Rotate left / right about vertical axis
 
 
 3. **Robotiq 2F-140 gripepr control using the keys:**
 
-    *Left arrow:* Gripper close
+    ***Left arrow:*** Gripper close
 
-    *Right arrow:* Gripper open
+    ***Right arrow:*** Gripper open
 
 ### Requirements
 This code must be run as sudo due to the use of the 'keyboard' library.
