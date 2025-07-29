@@ -1,5 +1,5 @@
 # ⚙️ UR3e Teleoperation
-This folder contains two methods to teleoperate a UR3e cobot with a wrist-attached Robotiq 2F-140 two-finger gripper using Python: one using a keyboard, and the other using a PlayStation-5 (DualSense) controller.
+This folder contains two methods to teleoperate a UR3e cobot with a wrist-attached Robotiq 2F-140 two-finger gripper using Python: one using a keyboard, and the other using a PlayStation 5 (DualSense) controller.
 
 The functioning of each method is described below.
 
@@ -23,15 +23,15 @@ This code allows for:
     ***NM:*** Rotate about z-axis (vertical axis)
 
 
-3. **Robotiq 2F-140 gripepr control using the keys:**
+3. **Robotiq 2F-140 gripper control using the keys:**
 
     ***Left arrow:*** Gripper close
 
     ***Right arrow:*** Gripper open
 
 **Other parameters that can be modified include:**
-- Linear speed of robot (for translation)
-- Angular speed of robot (for rotation)
+- Linear speed of the robot (for translation)
+- Angular speed of the robot (for rotation)
 - Gripper force
 - Gripper speed
 
@@ -39,7 +39,7 @@ This code allows for:
 
 ### Working
 - Robot control works using RTDE (Real-Time Data Exchange) protocol.
-- Gripper control is implemented using the class RobotiqSocketGripper (also in the Teleop directory).
+- Gripper control is implemented using the class '*RobotiqSocketGripper*' (also in the Teleop directory).
 
 ### Requirements
 - Fill the static IP address of your robot in the code. 
@@ -66,15 +66,15 @@ This code allows for:
     ***R1 / R2:*** Rotate about z-axis (vertical axis)
 
 
-3. **Robotiq 2F-140 gripepr control using:**
+3. **Robotiq 2F-140 gripper control using:**
 
     ***Square button:*** Gripper close
 
     ***Circle button:*** Gripper open
 
 **Other parameters that can be modified include:**
-- Linear speed of robot (for translation)
-- Angular speed of robot (for rotation)
+- Linear speed of the robot (for translation)
+- Angular speed of the robot (for rotation)
 - Gripper force
 - Gripper speed
 
@@ -82,7 +82,7 @@ This code allows for:
 
 ### Working
 - Robot control works using RTDE (Real-Time Data Exchange) protocol.
-- Gripper control is implemented using the class RobotiqSocketGripper (also in the Teleop directory).
+- Gripper control is implemented using the class '*RobotiqSocketGripper*' (also in the Teleop directory).
 
 ### Requirements
 - Fill the static IP address of your robot in the code. 
@@ -94,4 +94,4 @@ In both methods of teleoperation, Robotiq gripper control is achieved using the 
 
 The class enables connection, activation and movement of the gripper to a specific pose. It also allows for setting the speed and force of the gripper, among other things.
 
-Pose, speed and force are defined between values 0-255.
+Pose, speed and force are defined between values 0 and 255.

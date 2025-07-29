@@ -2,7 +2,7 @@
 This repository contains code to teleoperate a UR3e-2 cobot with a wrist-attached Robotiq 2F-140 two-finger gripper using Python. 
 Codes for two methods of teleoperation are provided:
 1. Keyboard-based, and,
-2. PlayStation-5 (DualSense) controller-based.
+2. PlayStation 5 (DualSense) controller-based.
 
 The repository also contains code for a 'sensor manager' that can be used to start and stop recordings from multiple sensors simultaneously based on keyboard inputs.
 
@@ -14,7 +14,7 @@ Further instructions for each part are provided in the README.md of their respec
 The setup involves:
 1. UR3e Robotic Arm
 2. 2F-140 Robotiq two-finger gripper
-3. Keyboard / PlayStation-5 (DualSense) controller
+3. Keyboard / PlayStation 5 (DualSense) controller
 
 #### Sensor control:
 The 'sensor manager' is intended to be used along with a simultaneously teleoperated robot. Therefore, in addition to the above components, the sensors required include:
@@ -52,7 +52,7 @@ The 'sensor manager' is intended to be used along with a simultaneously teleoper
 12. Save the installation using the 'Save' button on the top-right of the screen. Restart the robot if required.
 
 ##### *III. Program:*
-13. Download the UR program 'robotiq_gripper_python.urp' from this repository. Copy the file to a USB drive. Insert the drive into the teach pendant.
+13. Download the UR program '**robotiq_gripper_python.urp**' from this repository. Copy the file to a USB drive. Insert the drive into the teach pendant.
 14. Click the 'Open' button on the top right of the screen and open the URP from your USB drive. Save the URP on your teach pendant using the 'Save' button on the top right of the screen.
 15. Go to Installation (Top left of the screen) > General > Startup. Under 'Default Program File', select the newly saved URP for 'Load default program'. This will ensure that you do not have to reload the program after every startup of the robot.
 
