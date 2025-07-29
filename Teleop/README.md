@@ -1,5 +1,6 @@
 # ⚙️ UR3e Teleoperation
-This folder contains two methods to teleoperate a UR3e cobot with a wrist-attached Robotiq 2F-140 two-finger gripper using Python: one using a keyboard, and the other using a PlayStation 5 (DualSense) controller.
+This directory contains two methods to teleoperate a UR3e cobot with a wrist-attached Robotiq 2F-140 two-finger gripper using Python: one using a keyboard, and the other using a PlayStation 5 (DualSense) controller.
+Both methods work based on control of TCP position.
 
 The functioning of each method is described below.
 
@@ -95,3 +96,20 @@ In both methods of teleoperation, Robotiq gripper control is achieved using the 
 The class enables connection, activation and movement of the gripper to a specific pose. It also allows for setting the speed and force of the gripper, among other things.
 
 Pose, speed and force are defined between values 0 and 255.
+
+## Note
+The direction of movement of the keys may vary based on the direction of viewing the robot and the direction of the TCP. 
+Directions can be adjusted by the addition or removal of '-' signs for the *speed_vector* variable in the code.
+
+For example, in *teleop_keyboard.py*, if key 'a' moves your robot right instead of left, change the following code block:
+```
+        elif keyboard.is_pressed("a"): # Left
+            speed_vector[0] = -linear_speed_magnitude
+```
+to:
+```
+        elif keyboard.is_pressed("a"): # Left
+            speed_vector[0] = linear_speed_magnitude
+```
+
+Similar changes can be made to *teleop_ps5.py* also if required.
