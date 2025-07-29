@@ -97,7 +97,7 @@ The class enables connection, activation and movement of the gripper to a specif
 
 Pose, speed and force are defined between values 0 and 255.
 
-## Note
+## Note:
 The direction of movement of the keys may vary based on the direction of viewing the robot and the direction of the TCP. 
 Directions can be adjusted by the addition or removal of '-' signs for the *speed_vector* variable in the code.
 
