@@ -10,7 +10,7 @@ Further instructions for each part are provided in the README.md of their respec
 
 ## Experimental Setup
 
-![Experimental Setup](Images/experimental_setup.tiff)
+![Experimental Setup](Images/experimental_setup.png)
 
 ### Hardware Requirements
 #### Teleoperation:
