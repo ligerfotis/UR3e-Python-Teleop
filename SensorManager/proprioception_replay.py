@@ -24,8 +24,8 @@ from rtde_control import RTDEControlInterface
 from Teleop.robotiq_socket_gripper import RobotiqSocketGripper
 
 # Set parameters
-robot_ip = "192.168.1.223"
-json_file = "proprioception_log.json"
+robot_ip = " "
+json_file = " "
 frequency = 100.0  # Frequency of robot control (Hz)
 use_tcp_pose = True  # Set to True if you want to replay using TCP pose instead of joint angles
 
