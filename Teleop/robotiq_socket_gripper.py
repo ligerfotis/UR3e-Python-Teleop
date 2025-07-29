@@ -1,4 +1,5 @@
-"""Class using socket to control Robotiq 2F-140 gripper"""
+"""Class using socket to control a Robotiq 2F-140 gripper"""
+"""Allows for connection, activation and movement of gripper; also enables setting speed and force of gripper"""
 
 import socket, time
 
