@@ -35,9 +35,9 @@ current_pos = gripper.get_pos() or 0 # Initialize gripper position
 
 print("""6-DOF Robot Control Using PS5 Controller. Press 'Option' button (three horizontal lines, right of controller) to quit.
 LEFT JOYSTICK: Translate right/left, forward/backward
-RIGHT JOYSTICK: Rotate left upward/right upward, forward/backward
-L1, L2: Up/down
-R1, R2: Rotate left/right about Z-axis
+RIGHT JOYSTICK: Rotate about x-axis, Rotate about y-axis
+L1, L2: Translate up/down
+R1, R2: Rotate about Z-axis (vertical axis)
 SQUARE: Close gripper
 CIRCLE: Open gripper""")
 
