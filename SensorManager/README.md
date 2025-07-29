@@ -1,17 +1,17 @@
 # 🖥️ Sensor Manager
 This directory contains codes that enable simultaneous recording from multiple sensors based on keyboard inputs for when to start and stop recording. 
-These sensor recordings are intended to be done alongside robot teleoperation, which can be done using codes from the *Teleop* directory.
+These sensor recordings are intended to be done alongside robot teleoperation, which can be done using the codes from the *Teleop* directory.
 
 The sensor recordings that can be done using these codes include:
 1. Webcam video to record the entire robot setup
 2. Multiple DIGIT sensor videos (one sensor on each gripper finger)
-3. RealSense camera colour and depth videos (camera mounted on the gripper)
+3. RealSense camera RGB and depth videos (camera mounted on the gripper)
 4. Microphone audio to record gripper sound
 5. Proprioception logging to log TCP, joint and gripper positions
 
 Frame / sample logs are also created with timestamps for each sensor during recording periods to allow for quality checking. 
 
-In addition, there is also a '***proprioception_replay.py***' file which could be used to replay the movements logged by *proprioception_logger.py*.
+In addition, there is also a '***proprioception_replay.py***' file which can be used to replay the movements logged by *proprioception_logger.py*.
 
 ***All video recordings are set to be written at 30 FPS and the audio recording is set to be written at 48 kHz.***
 
@@ -35,7 +35,12 @@ A live preview is shown on the screen for the webcam, DIGIT sensors and RealSens
 
 ### Notes:
 - Check the live preview of the sensors before recordings to make sure that all of them are functioning properly.
-- Ensure that the DIGIT sensors and RealSense camera are plugged in to USB 3.0 ports to prevent drops in FPS or frequent disconnection.
+- Ensure that the DIGIT sensors and RealSense camera are plugged in to USB 3.0 ports without shared hubs to prevent drops in FPS or frequent disconnection.
+- **Since the program is to be run in sudo, the generated sensor data may only have root access. To give folder permission to the user, run the following command in the terminal:**
+```angular2html
+sudo chown -R user:user [folder_path]
+```
+This command will ensure that all files within the specified folder are now owned by the required user.
 
 ## camera_capture.py
 This code is used to record AVI videos from a **single** webcam. The code contains two functions:
@@ -77,4 +82,22 @@ The code contains one function:
 The proprioception logging does not require teleoperation using the *Teleop* directory codes to work. The logging works even when moving the robot in freedrive mode.
 
 ## proprioception_replay.py
-This code can be used to replay the movements recorded 
+This code can be used to replay the movements recorded by *proprioception_logger*. 
+However, any JSON log file could be used as long as it has **either one** of the following sets of logged entries:
+1. "*elapsed_time*", "*tcp_pose_mm*" and "*gripper_position_0_255*", or,
+2. "*elapsed_time*", "*joint_positions_rad*" and "*gripper_position_0_255*".
+
+Therefore, the proprioception replay can be done using either TCP positions or joint angles.
+
+This code functions using the RTDE protocol.
+
+### Notes:
+- Active the gripper prior to start.
+- Ensure the robot is in 'Remote Control' mode.
+
+## Other Utility Functions
+### I. get_unique_filename.py
+*get_unique_filename()*: Adds a number after each sensor filename in order to prevent overwriting of previously generated files.
+
+### II. sensor_control_keyboard.py
+*sensor_control_keyboard()*: Takes in the keyboard inputs for recording start, recording stop and program stop and converts them into threading events for sensor synchronization.
