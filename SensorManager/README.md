@@ -77,4 +77,4 @@ The code contains one function:
 The proprioception logging does not require teleoperation using the *Teleop* directory codes to work. The logging works even when moving the robot in freedrive mode.
 
 ## proprioception_replay.py
-This code can be used to replay 
+This code can be used to replay the movements recorded 
