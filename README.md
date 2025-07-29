@@ -9,6 +9,9 @@ The repository also contains code for a 'sensor manager' that can be used to sta
 Further instructions for each part are provided in the README.md of their respective directories.
 
 ## Experimental Setup
+
+![Experimental Setup](Images/experimental_setup.tiff)
+
 ### Hardware Requirements
 #### Teleoperation:
 The setup involves:
