@@ -5,7 +5,7 @@ Both methods work based on the control of TCP position.
 The functioning of each method is described below.
 
 ## User Instructions
-### Requirements
+### I. Requirements
 **In both cases:**
 - Fill the static IP address of your robot in the code in the variable *robot_ip* (for example, robot_ip = "192.168.1.222").
 - Ensure that the robot is in 'Remote Control' mode.
@@ -16,7 +16,7 @@ The functioning of each method is described below.
 **For *teleop_ps5.py*:**
 - Connect the PlayStation 5 controller to your computer using Bluetooth. The controller can be put into pairing mode by simultaneously pressing the 'PS' button (bottom of the controller, above the microphone button) and the 'Share' button (three diagonal lines, on the left of the controller).
 
-### Running the Codes
+### II. Running the Codes
 For keyboard-based teleoperation, run the following command:
 ```
 cd /path/to/repository/UR3e-Python-Teleop
@@ -28,7 +28,7 @@ cd /path/to/repository/UR3e-Python-Teleop
 .venv/bin/python Teleop/teleop_ps5.py
 ```
 
-### Control
+### III. Control
 Both, keyboard and PlayStation 5 controller based methods of teleoperation allow for 6-DOF control: 3 axes of translation, and 3 axes of rotation.
 They also enable gripper open and close.
 The control keys for both methods are as follows:
@@ -47,7 +47,7 @@ The 'Option' button on the PS5 5 controller has three horizontal lines, and is f
 - Gripper force
 - Gripper speed
 
-### Working
+### IV. Working
 In both cases:
 - Robot control works using RTDE (Real-Time Data Exchange) protocol.
 - Gripper control is implemented using the class '*RobotiqSocketGripper*' (also in the *Teleop* directory).
