@@ -56,7 +56,7 @@ After the initial robot setup, there are some steps to be followed for setup aft
 4. Put the robot in 'Remote Control' mode using the button on the top-right of the screen.
 
 ## Teleoperating the Robot
-Before running either of the following codes, ensure that you fill in the static IP address of your robot in the variable '*robot_ip*' in that code (for example, robot_ip = "192.168.1.222").
+Before running either of the following codes, ensure that you fill in the static IP address of your robot in the variable '***robot_ip***' in that code (for example, robot_ip = "192.168.1.222").
 
 ### I. Keyboard-based
 In order to implement the keyboard-based teleoperation, run the following command:
@@ -99,14 +99,14 @@ Further details on how to use the program are mentioned in the README.md in the 
 
 ## Proprioception Replay
 Before running the code:
-1. Fill in the static IP address of your robot in the variable '*robot_ip*' (for example, robot_ip = "192.168.1.222").
-2. Fill in the path of the JSON file from which the movements are to be replayed in the variable '*json_file*' (for example, json_file = "/home/user/SensorCapture/proprioception_log.json").
+1. Fill in the static IP address of your robot in the variable '***robot_ip***' (for example, robot_ip = "192.168.1.222").
+2. Fill in the path of the JSON file from which the movements are to be replayed in the variable '***json_file***' (for example, json_file = "/home/user/SensorCapture/proprioception_log.json").
 
 Then run the following command:
 ```
 PYTHONPATH=$(pwd) .venv/bin/python SensorManager/proprioception_replay.py
 ```
 Further details on how to use the program are mentioned in the README.md in the '*SensorManager*' directory.
-
+**
 ## Known Issues
 The teleoperation codes do not check for singularities, and so, if a singularity is reached, the robot will enter a protective stop. The robot may require being restarted in order for the Python program to work again.
