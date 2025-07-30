@@ -5,6 +5,29 @@ Both methods work based on the control of TCP position.
 The functioning of each method is described below.
 
 ## User Instructions
+### Requirements
+**In both cases:**
+- Fill the static IP address of your robot in the code in the variable *robot_ip* (for example, robot_ip = "192.168.1.222").
+- Ensure that the robot is in 'Remote Control' mode.
+
+**For *teleop_keyboard.py*:**
+- This code must be run as sudo due to the use of the 'keyboard' library.
+
+**For *teleop_ps5.py*:**
+- Connect the PlayStation 5 controller to your computer using Bluetooth. The controller can be put into pairing mode by simultaneously pressing the 'PS' button (bottom of the controller, above the microphone button) and the 'Share' button (three diagonal lines, on the left of the controller).
+
+### Running the Codes
+For keyboard-based teleoperation, run the following command:
+```
+cd /path/to/repository/UR3e-Python-Teleop
+sudo .venv/bin/python Teleop/teleop_keyboard.py
+```
+For PS5-based teleoperation, run the following command:
+```
+cd /path/to/repository/UR3e-Python-Teleop
+.venv/bin/python Teleop/teleop_ps5.py
+```
+
 ### Control
 Both, keyboard and PlayStation 5 controller based methods of teleoperation allow for 6-DOF control: 3 axes of translation, and 3 axes of rotation.
 They also enable gripper open and close.
@@ -28,17 +51,6 @@ The 'Option' button on the PS5 5 controller has three horizontal lines, and is f
 In both cases:
 - Robot control works using RTDE (Real-Time Data Exchange) protocol.
 - Gripper control is implemented using the class '*RobotiqSocketGripper*' (also in the *Teleop* directory).
-
-### Requirements
-**In both cases:**
-- Fill the static IP address of your robot in the code in the variable *robot_ip* (for example, robot_ip = "192.168.1.222").
-- Ensure that the robot is in 'Remote Control' mode.
-
-**For *teleop_keyboard.py*:**
-- This code must be run as sudo due to the use of the 'keyboard' library.
-
-**For *teleop_ps5.py*:**
-- Connect the PlayStation 5 controller to your computer using Bluetooth. The controller can be put into pairing mode by simultaneously pressing the 'PS' button (bottom of the controller, above the microphone button) and the 'Share' button (three diagonal lines, on the left of the controller).
 
 ## Class RobotiqSocketGripper
 In both methods of teleoperation, Robotiq gripper control is achieved using the class '**RobotiqSocketGripper**'. This class works based on socket communication.
