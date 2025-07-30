@@ -60,7 +60,7 @@ Pose, speed and force are defined between values 0 and 255.
 
 ## Note:
 The direction of movement of the robot when pressing the keys may vary based on the direction of viewing the robot and the direction of the TCP. 
-Directions can be adjusted by the addition or removal of '-' signs for the '*speed_vector*' variable in the concerned code.
+Directions can be adjusted by the addition or removal of '-' signs for the '***speed_vector***' variable in the concerned code.
 
 For example, in *teleop_keyboard.py*, if key 'A' moves your robot right instead of left, change the following code block:
 ```
