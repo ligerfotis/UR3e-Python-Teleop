@@ -59,7 +59,7 @@ try:
             speed_vector[1] = -linear_speed_magnitude
         elif keyboard.is_pressed("s"): # Backward
             speed_vector[1] = linear_speed_magnitude
-        elif keyboard.is_pressed("y"): # Up (y for German keyboard, change to z if required)
+        elif keyboard.is_pressed("z"): # Up
             speed_vector[2] = -linear_speed_magnitude
         elif keyboard.is_pressed("x"): # Down
             speed_vector[2] = linear_speed_magnitude
