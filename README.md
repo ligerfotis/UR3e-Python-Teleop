@@ -107,6 +107,6 @@ Then run the following command:
 PYTHONPATH=$(pwd) .venv/bin/python SensorManager/proprioception_replay.py
 ```
 Further details on how to use the program are mentioned in the README.md in the '*SensorManager*' directory.
-**
+
 ## Known Issues
 The teleoperation codes do not check for singularities, and so, if a singularity is reached, the robot will enter a protective stop. The robot may require being restarted in order for the Python program to work again.
