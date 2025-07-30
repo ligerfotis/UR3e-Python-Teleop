@@ -15,89 +15,82 @@ In addition, there is also a '***proprioception_replay.py***' file which can be 
 
 ***All video recordings are set to be written at 30 FPS and the audio recording is set to be written at 48 kHz.***
 
-## sensor_manager.py
-This is the main code file that should be run in order to start the program. This code manages all the other sensors using threads.
+## Sensor Capture (Record)
+'***sensor_manager.py***' contains the code that should be run in order to start the sensor capture. This code manages all the other sensors using threads.
 
-The status of the sensors in terms of detection and connection is shown on the terminal. At the end of each recording, the FPS of the recording along with the filepath is displayed. 
-If there was a significant deviation in FPS (>= 3 FPS for videos and >= 1500 samples per second for audio), it will be indicated on the terminal after recording stop.
+### I. Features
+- The status of the sensors in terms of detection and connection is shown on the terminal. 
+- A live preview is shown on the screen for the webcam, DIGIT sensors and RealSense colour and depth cameras as long as the program is running.
+- For each sensor, apart from the sensor data, a frame / sample log with corresponding timestamps (in terms of elapsed time from recording start) is generated to allow for quality control. 
+- At the end of each recording, the FPS of the recording along with the filepath is displayed. 
+- If there was a significant deviation in FPS (>= 3 FPS for videos and >= 1500 samples per second for audio), it will be indicated on the terminal after recording stop. 
 
-A live preview is shown on the screen for the webcam, DIGIT sensors and RealSense colour and depth cameras as long as the program is running.
+### II. Requirements
+1. Ensure that all your sensors are connected to your computer.
+2. Fill in '***robot_ip***' in *sensor_manager.py* with your robot's static IP address 
+   (for example, robot_ip = "192.168.1.222")
+3. Fill in '***root_dir***' in *sensor_manager.py* with the path to the directory where you want your sensor data to be saved (for example, root_dir = "/home/user/SensorCapture")
+4. Fill in Line 17 (***if " " in name:***) in *find_microphone_index()* in *audio_capture.py* with the name of your audio device (for example, if "pnp audio" in name:). 
+   - In order to find the name of your device, open a Python script and run the following command:
+   ```
+   import sounddevice as sd
+   print(sd.query_devices())
+   ```
+   - Identify your microphone and modify the string with its name.
 
-### User Instructions
-- Press '1' to start recording
-- Press '2' to stop recording
-- Press '3' to stop the program
+### III. Running the Code
+Run the following command to begin sensor capture:
+```
+sudo PYTHONPATH=$(pwd) .venv/bin/python SensorManager/sensor_manager.py
+```
+This code is run as sudo due to the use of the 'keyboard' library for the recording start and stop inputs.
 
-### Requirements
-- Fill the static IP address of your robot in the code. 
-- Fill the directory name to store the recorded data in.
-- This code must be run as sudo due to the use of the 'keyboard' library.
+### IV. User Instructions
+After the code is run, pressing the following keyboard keys controls recording timing:
 
-### Notes:
-- Check the live preview of the sensors before recordings to make sure that all of them are functioning properly.
-- Ensure that the DIGIT sensors and RealSense camera are plugged in to USB 3.0 ports without shared hubs to prevent drops in FPS or frequent disconnection.
-- **Since the program is to be run in sudo, the generated sensor data may only have root access. To give folder permission to the user, run the following command in the terminal:**
-```angular2html
+| Key |     Function     |
+|:---:|:----------------:|
+|  1  | Start recording  |
+|  2  |  Stop recording  |
+|  3  | Stop the program |
+
+### V. Notes
+1. Check the live preview of the sensors before recordings to make sure that all of them are functioning properly.
+2. Ensure that the DIGIT sensors and RealSense camera are plugged into USB 3.0 ports without shared hubs to prevent drops in FPS or frequent disconnection.
+3. **Since the program is to be run in sudo, the generated sensor data may only have root access. To give folder permission to the user, run the following command in the terminal:**
+```
 sudo chown -R user:user [folder_path]
 ```
-This command will ensure that all files within the specified folder are now owned by the required user.
+This command will ensure that all files within the specified folder are now owned by the specified user.
 
-## camera_capture.py
-This code is used to record AVI videos from a **single** webcam. The code contains two functions:
-1. ***find_camera_index()***: Detects a camera that is not a DIGIT sensor or a RealSense camera. This function only works in Linux systems due to the '*pyudev*' module.
-2. ***camera_capture()***: Uses the detected camera to start and stop recording videos based on keyboard inputs. Pushes frames to queue for live preview in *sensor_manager.py*. Also creates JSON frame logs during recording.
+#### 4. Proprioception Logging
+'***proprioception_logger()***' in '*proprioception_logger.py*' creates a 30Hz JSON log of the following parameters:
+  1. "***elapsed_time***": Time elapsed from recording start
+  2. "***tcp_pose_mm***": Cartesian pose of TCP in mm
+  3. "***joint_positions_rad***": Joint angles in rad
+  4. "***gripper_position_0_255***": Gripper position in range 0-255
+  5. "***gripper_position_mm***": Gripper position in mm
 
-## digit_capture.py
-This code is used to record AVI videos from **multiple** DIGIT sensors. The code contains two functions:
-1. ***digit_capture()***: Detects all connected DIGIT sensors' serial numbers and creates a separate thread for each of them. Starts and stops the threads based on keyboard inputs.
-2. ***run_digit_thread()***: Starts and stops recording videos based on keyboard inputs for a single DIGIT sensor. Pushes frames to queue for live preview in *sensor_manager.py*. Also creates JSON frame logs during recording.
+The proprioception logging does not require teleoperation using the '*Teleop*' directory codes to work. The logging works even when manually moving the robot in freedrive mode.
 
-## realsense_capture_color.py
-This code is used to record RGB AVI videos from a **single** RealSense camera. The code contains one function:
-- ***realsense_capture_color()***: Starts and stops recording videos based on keyboard inputs for an RGB RealSense camera. Pushes frames to queue for live preview in *sensor_manager.py*. Also creates JSON frame logs during recording.
+## Proprioception Replay
+'***proprioception_replay.py***' contains the code can be used to replay the movements recorded by *proprioception_logger()*. 
 
-## realsense_capture_depth.py
-This code is used to record depth AVI videos from a **single** RealSense camera. The code contains one function:
-- ***realsense_capture_depth()***: Starts and stops recording videos based on keyboard inputs for a depth RealSense camera. Pushes frames to queue for live preview in *sensor_manager.py*. Also creates JSON frame logs during recording.
-
-## audio_capture.py
-This code is used to record WAV audio from a **single** microphone. The code contains two functions:
-1. ***find_microphone_index()***: Detects a microphone based on its name. 
-2. ***audio_capture()***: Uses the detected camera to start and stop recording audio based on keyboard inputs. Also creates JSON sample logs during recording.
-
-### Note:
-The automatic microphone detection by *find_microphone_index* is done based on the name of the microphone to prevent use of the webcam microphones. 
-Fill in the name for your microphone accordingly. 
-
-## proprioception_logger.py
-This code is used to log the TCP positions, joint angles and gripper positions of the UR robot with their respective timestamps.
-The code contains one function:
-- ***proprioception_logger()***: Creates a 30Hz JSON log of the following parameters:
-    1. "*elapsed_time*": Time elapsed from recording start
-    2. "*tcp_pose_mm*": Cartesian pose of TCP in mm
-    3. "*joint_positions_rad*": Joint angles in rad
-    4. "*gripper_position_0_255*": Gripper position in range 0-255
-    5. "*gripper_position_mm*": Gripper position in mm
-
-The proprioception logging does not require teleoperation using the *Teleop* directory codes to work. The logging works even when moving the robot in freedrive mode.
-
-## proprioception_replay.py
-This code can be used to replay the movements recorded by *proprioception_logger*. 
-However, any JSON log file could be used as long as it has **either one** of the following sets of logged entries:
+### I. Requirements
+While this code is intended to replay movements logged by '*proprioception_logger()*', any JSON log file could be used as long as it has **either one** of the following sets of logged entries:
 1. "*elapsed_time*", "*tcp_pose_mm*" and "*gripper_position_0_255*", or,
 2. "*elapsed_time*", "*joint_positions_rad*" and "*gripper_position_0_255*".
 
 Therefore, the proprioception replay can be done using either TCP positions or joint angles.
 
-This code functions using the RTDE protocol.
+**Before running the code:**
+1. Fill in the static IP address of your robot in the variable '***robot_ip***' (for example, robot_ip = "192.168.1.222").
+2. Fill in the path of the JSON file from which the movements are to be replayed in the variable '***json_file***' (for example, json_file = "/home/user/SensorCapture/proprioception_log.json").
+3. Active the gripper.
+4. Ensure the robot is in 'Remote Control' mode.
 
-### Notes:
-- Active the gripper prior to start.
-- Ensure the robot is in 'Remote Control' mode.
-
-## Other Utility Functions
-### I. get_unique_filename.py
-*get_unique_filename()*: Adds a number after each sensor filename in order to prevent overwriting of previously generated files.
-
-### II. sensor_control_keyboard.py
-*sensor_control_keyboard()*: Takes in the keyboard inputs for recording start, recording stop and program stop and converts them into threading events for sensor synchronization.
+### II. Running the Code
+Run the following command to begin proprioception replay:
+```
+PYTHONPATH=$(pwd) .venv/bin/python SensorManager/proprioception_replay.py
+```

@@ -5,6 +5,7 @@ Codes for two methods of teleoperation are provided:
 2. PlayStation 5 (DualSense) controller-based.
 
 The repository also contains code for a 'sensor manager' that can be used to start and stop recordings from multiple sensors simultaneously based on keyboard inputs.
+There is also a provision to replay the proprioception movements logged by the 'sensor manager'.
 
 Further instructions for each part are provided in the README.md of their respective directories.
 
@@ -92,7 +93,20 @@ Then run the following command to begin sensor capture:
 ```
 sudo PYTHONPATH=$(pwd) .venv/bin/python SensorManager/sensor_manager.py
 ```
-Further details about each sensor capture function are mentioned in the README.md in the '*SensorManager*' directory.
+This command requires sudo permission due to the use of the 'keyboard' module.
+
+Further details on how to use the program are mentioned in the README.md in the '*SensorManager*' directory.
+
+## Proprioception Replay
+Before running the code:
+1. Fill in the static IP address of your robot in the variable '*robot_ip*' (for example, robot_ip = "192.168.1.222").
+2. Fill in the path of the JSON file from which the movements are to be replayed in the variable '*json_file*' (for example, json_file = "/home/user/SensorCapture/proprioception_log.json").
+
+Then run the following command:
+```
+PYTHONPATH=$(pwd) .venv/bin/python SensorManager/proprioception_replay.py
+```
+Further details on how to use the program are mentioned in the README.md in the '*SensorManager*' directory.
 
 ## Known Issues
 The teleoperation codes do not check for singularities, and so, if a singularity is reached, the robot will enter a protective stop. The robot may require being restarted in order for the Python program to work again.

@@ -7,7 +7,7 @@ The functioning of each method is described below.
 ## User Instructions
 ### I. Requirements
 **In both cases:**
-- Fill the static IP address of your robot in the code in the variable *robot_ip* (for example, robot_ip = "192.168.1.222").
+- Fill the static IP address of your robot in the code in the variable '*robot_ip*' (for example, robot_ip = "192.168.1.222").
 - Ensure that the robot is in 'Remote Control' mode.
 
 **For *teleop_keyboard.py*:**
