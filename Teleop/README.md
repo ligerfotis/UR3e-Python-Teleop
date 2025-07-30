@@ -10,9 +10,6 @@ The functioning of each method is described below.
 - Fill the static IP address of your robot in the code in the variable '***robot_ip***' (for example, robot_ip = "192.168.1.222").
 - Ensure that the robot is in 'Remote Control' mode.
 
-**For *teleop_keyboard.py*:**
-- This code must be run as sudo due to the use of the 'keyboard' library.
-
 **For *teleop_ps5.py*:**
 - Connect the PlayStation 5 controller to your computer using Bluetooth. The controller can be put into pairing mode by simultaneously pressing the 'PS' button (bottom of the controller, above the microphone button) and the 'Share' button (three diagonal lines, on the left of the controller).
 
@@ -22,6 +19,8 @@ For keyboard-based teleoperation, run the following command:
 cd /path/to/repository/UR3e-Python-Teleop
 sudo .venv/bin/python Teleop/teleop_keyboard.py
 ```
+This code must be run as sudo due to the use of the 'keyboard' library.
+
 For PS5-based teleoperation, run the following command:
 ```
 cd /path/to/repository/UR3e-Python-Teleop
