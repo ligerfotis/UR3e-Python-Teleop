@@ -19,7 +19,7 @@ The setup involves:
 2. 2F-140 Robotiq two-finger gripper
 3. Keyboard / PlayStation 5 (DualSense) controller
 
-#### Sensor control:
+#### Sensor capture:
 The 'sensor manager' is intended to be used along with a simultaneously teleoperated robot. Therefore, in addition to the above components, the sensors required include:
 1. Webcam to view the entire setup
 2. DIGIT sensors on the gripper fingers
@@ -32,34 +32,10 @@ The 'sensor manager' is intended to be used along with a simultaneously teleoper
 - **PolyScope:** 5.15
 
 ## Setup and Installation
-### Initial Robot Setup
-#### *On the robot:*
-1. Connect the Robotiq 2F-140 gripper to the wrist of the robot. 
-2. Connect the robot to your computer through an Ethernet cable.
+These are the steps to be followed before running any of the codes in this repository. 
+The steps for initial robot setup are mentioned in detail in '*ROBOT_SETUP.md*' in this repository.
 
-#### *On the Teach Pendant:*
-##### *I. Static IP Network Setup:*
-1. Power on the robot.
-2. Ensure the robot is in 'Local Control'. (Button on the top-right of the screen)
-3. Go to Options (Right-most button at the top of the screen) > Settings > System > Network. Select the network method as 'Static Address'. Set an IP address for the robot and keep the default Subnet mask of *255.255.255.0*.
-4. On your computer, go to Settings and detect the Ethernet cable of your robot. Click the gear icon next to the cable and go to 'IPv4'. Select the IPv4 Method as 'Manual' and set a static IP address for your computer. Keep the default Subnet mask of *255.255.255.0*.
-5. Ensure the static IP addresses just set for your robot and computer match.
-
-##### *II. Installation:*
-6. Download the URCap required for the 2F-140 Robotiq gripper [here](https://robotiq.com/support). Copy the file to a USB drive. Insert the drive into the teach pendant.
-7. Go to Options (Right-most button at the top of the screen) > Settings > System > URCaps. Select the '+' icon and open the URCap from your USB drive. Click 'Open' to add the URCap to the list of 'Active URCaps'. Click 'Restart' to allow the changes to take place.
-8. Power on the robot again.
-9. Go to Installation (Top-left of the screen) > General > Tool I/O. Under I/O Interface Control, select 'Controlled by' 'Robotiq_Grippers'.
-10. Go to Installation > URCaps > Gripper, and scan for the gripper. Once detected, activate the gripper using the 'Activate' button.
-11. Go to Options (Right-most button at the top of the screen) > Settings > Security > Services, and ensure that RTDE is enabled.
-12. Save the installation using the 'Save' button on the top-right of the screen. Restart the robot if required.
-
-##### *III. Program:*
-13. Download the UR program '**robotiq_gripper_python.urp**' from this repository. Copy the file to a USB drive. Insert the drive into the teach pendant.
-14. Click the 'Open' button on the top right of the screen and open the URP from your USB drive. Save the URP on your teach pendant using the 'Save' button on the top right of the screen.
-15. Go to Installation (Top left of the screen) > General > Startup. Under 'Default Program File', select the newly saved URP for 'Load default program'. This will ensure that you do not have to reload the program after every startup of the robot.
-
-### Initial Computer Setup
+### Initial Computer Setup and Installation
 1. Clone the repository.
 ```
 git clone https://github.com/Sujatha-H/UR3e-Python-Teleop
@@ -72,11 +48,51 @@ pip install -r requirements.txt
 ```
 
 ### Robot Setup After Every Startup
-After the initial setup, there are some steps to be followed for setup after every power up of the robot in order to run the Python programs for teleoperation. These are as follows:
+After the initial robot setup, there are some steps to be followed for setup after every power up of the robot in order to run the Python programs for teleoperation. These are as follows:
 1. Go to Installation > URCaps > Gripper, and ensure that the gripper is detected. Once detected, activate the gripper using the 'Activate' button.
-2. Go to Run (Left-most button at the top of the screen). Ensure that the title of your default program, 'robotiq_gripper_python', is shown under 'Program'.
+2. Go to Run (Left-most button at the top of the screen). Ensure that the title of your default program, 'robotiq_gripper_python', is shown under 'Program' (steps to download the UR program are given in detail in *ROBOT_SETUP.md*).
 3. Under 'Control', click the 'play' button to start playing the program. This UR program must be running whenever the Python program is run.
-4. Put the robot in 'Remote Control' using the button on the top-right of the screen.
+4. Put the robot in 'Remote Control' mode using the button on the top-right of the screen.
+
+## Teleoperating the Robot
+Before running either of the following codes, ensure that you fill in the static IP address of your robot in the variable '*robot_ip*' in that code (for example, robot_ip = "192.168.1.222").
+
+### I. Keyboard-based
+In order to implement the keyboard-based teleoperation, run the following command:
+```
+cd /path/to/repository/UR3e-Python-Teleop
+sudo .venv/bin/python Teleop/teleop_keyboard.py
+```
+This code requires sudo permission due to the use of the 'keyboard' module.
+
+### II. PlayStation 5 controller-based
+In order to implement the PlayStation 5 controller-based teleoperation, run the following command:
+
+(Ensure that your PS5 controller is connected to your computer via Bluetooth before running the command.)
+```
+cd /path/to/repository/UR3e-Python-Teleop
+.venv/bin/python Teleop/teleop_ps5.py
+```
+Further instructions on how to use each of these programs are mentioned in the README.md in the '*Teleop*' directory.
+
+## Sensor Capturing
+Before running the sensor capture code, ensure that all your sensors are connected to your computer. Fill in the following variables:
+1. '***robot_ip***' in *sensor_manager.py* with your robot's static IP address 
+   (for example, robot_ip = "192.168.1.222")
+2. '***root_dir***' in *sensor_manager.py* with the path to the directory where you want your sensor data to be saved (for example, root_dir = "/home/user/SensorCapture")
+3. Line 17 (***if " " in name:***) in *find_microphone_index()* in *audio_capture.py* with the name of your audio device (for example, if "pnp audio" in name:). 
+   - In order to find the name of your device, open a Python script and run the following command:
+   ```
+   import sounddevice as sd
+   print(sd.query_devices())
+   ```
+   - Identify your microphone and modify the string with its name.
+
+Then run the following command to begin sensor capture:
+```
+sudo PYTHONPATH=$(pwd) .venv/bin/python SensorManager/sensor_manager.py
+```
+Further details about each sensor capture function are mentioned in the README.md in the '*SensorManager*' directory.
 
 ## Known Issues
 The teleoperation codes do not check for singularities, and so, if a singularity is reached, the robot will enter a protective stop. The robot may require being restarted in order for the Python program to work again.
