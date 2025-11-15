@@ -1,17 +1,24 @@
 """Python code to control UR 6-DOF TCP movement and gripper opening/closing with a PlayStation controller"""
 """"Tested using a PS5 DualSense Controller and a UR3e cobot"""
-"""Activate gripper prior to start"""
+"""Gripper optional: script falls back to robot-only control if absent"""
 
 import pygame
 from rtde_control import RTDEControlInterface
 from robotiq_socket_gripper import RobotiqSocketGripper
 
 # Connect to robot and gripper
-robot_ip = " " # Ensure static IP addresses of robot and computer match
+robot_ip = "192.168.1.201" # Ensure static IP addresses of robot and computer match
 rtde_control = RTDEControlInterface(robot_ip)
 
-gripper = RobotiqSocketGripper(robot_ip)
-gripper.connect()
+gripper = None
+gripper_enabled = False
+try:
+    gripper = RobotiqSocketGripper(robot_ip)
+    gripper.connect()
+    gripper_enabled = True
+except OSError as exc:
+    print(f"Warning: Gripper unavailable ({exc}). Continuing without gripper control.")
+    gripper = None
 
 """
 UNITS:
@@ -29,9 +36,12 @@ speed_vector = [0.0] * 6 # Initialization
 
 # Gripper parameters
 i = 1 # Increment for gripper movement
-gripper.set_force(20) # Range: 0 (min) to 255 (max)
-gripper.set_speed(50) # Range: 0 (min) to 255 (max)
-current_pos = gripper.get_pos() or 0 # Initialize gripper position
+if gripper_enabled:
+    gripper.set_force(20) # Range: 0 (min) to 255 (max)
+    gripper.set_speed(50) # Range: 0 (min) to 255 (max)
+    current_pos = gripper.get_pos() or 0 # Initialize gripper position
+else:
+    current_pos = 0
 
 print("""6-DOF Robot Control Using PS5 Controller. Press 'Option' button (three horizontal lines, right of controller) to quit.
 LEFT JOYSTICK: Translate right/left, forward/backward
@@ -135,11 +145,11 @@ try:
             speed_vector[5] = 0.0
 
         # Gripper control
-        if joy.get_button(3): # Square (Close gripper)
+        if gripper_enabled and joy.get_button(3): # Square (Close gripper)
             current_pos = min(255, current_pos + i)
             gripper.move(current_pos)
 
-        elif joy.get_button(1): # Circle (Open gripper)
+        elif gripper_enabled and joy.get_button(1): # Circle (Open gripper)
             current_pos = min(255, current_pos - i)
             gripper.move(current_pos)
 
@@ -151,4 +161,6 @@ except KeyboardInterrupt:
 finally:
     rtde_control.jogStop()
     rtde_control.stopScript()
+    if gripper and gripper_enabled:
+        gripper.close()
     print("Jogging stopped.")
