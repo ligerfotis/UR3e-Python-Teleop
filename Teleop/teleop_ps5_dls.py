@@ -46,18 +46,20 @@ JOINT_LIMITS_MIN = np.deg2rad(np.array([-360, -360, -360, -360, -360, -360]))
 JOINT_LIMITS_MAX = np.deg2rad(np.array([360, 360, 360, 360, 360, 360]))
 
 # Workspace limits (simple box around the robot base) in base frame [m]
-WORKSPACE_MIN = np.array([0.05, -0.40, 0.05])  # x, y, z
-WORKSPACE_MAX = np.array([0.50, 0.40, 0.60])
+# Workspace limits (simple box around the robot base) in base frame [m]
+# Slightly relaxed to allow easier left/right crossing while remaining safe.
+WORKSPACE_MIN = np.array([-0.60, -0.60, 0.23])  # x, y, z
+WORKSPACE_MAX = np.array([0.60, 0.60, 0.65])
 
 # Preferred joint posture (comfortable "bent" pose), radians
 Q_PREFERRED = np.deg2rad(
     np.array(
         [
             0.0,   # joint 1
-            -75.0, # joint 2
-            120.0, # joint 3
-            -45.0, # joint 4
-            90.0,  # joint 5
+            0.0, # joint 2
+            0.0, # joint 3
+            0.0, # joint 4
+            00.0,  # joint 5
             0.0,   # joint 6
         ]
     )
@@ -380,5 +382,6 @@ finally:
     if gripper and gripper_enabled:
         gripper.close()
     print("DLS PS5 teleop stopped.")
+
 
 

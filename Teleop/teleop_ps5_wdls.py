@@ -48,7 +48,7 @@ JOINT_LIMITS_MAX = np.deg2rad(np.array([360, 360, 360, 360, 360, 360]))
 
 # Workspace limits (simple box around the robot base) in base frame [m]
 # Slightly relaxed to allow easier left/right crossing while remaining safe.
-WORKSPACE_MIN = np.array([-0.60, -0.60, 0.05])  # x, y, z
+WORKSPACE_MIN = np.array([-0.60, -0.60, 0.23])  # x, y, z
 WORKSPACE_MAX = np.array([0.60, 0.60, 0.65])
 
 # Preferred joint posture (comfortable "bent" pose), radians
