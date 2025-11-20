@@ -286,7 +286,18 @@ def extract_hand_pose(
     if detection_result is None or not detection_result.hand_landmarks:
         return color_image, None
 
-    hand_landmarks = detection_result.hand_landmarks[0]
+    # Select only the right hand (ignore any detected left hands)
+    target_idx = None
+    for idx, handedness in enumerate(detection_result.handedness):
+        if handedness and handedness[0].category_name.lower() == "right":
+            target_idx = idx
+            break
+
+    if target_idx is None:
+        # Right hand not found in this frame
+        return color_image, None
+
+    hand_landmarks = detection_result.hand_landmarks[target_idx]
 
     # Build proto and draw skeleton
     hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
